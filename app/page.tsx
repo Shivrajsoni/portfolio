@@ -1,14 +1,18 @@
-import Intro from "../components/intro.tsx";
-import  SectionDivider  from "../components/section-divider.tsx";
-import About from "../components/about.tsx";
-import Projects from "../components/projects.tsx";
+import Intro from "../components/intro";
+import SectionDivider from "../components/section-divider";
+import About from "../components/about";
+import Projects from "../components/projects";
+import Skills from "../components/skills";
+import Contact from "../components/contact";
 export default function Home() {
   return (
-  <main className = "flex flex-col items-center px-4">
-      <Intro/>
-      <SectionDivider/>
-      <About/>
-      <Projects/>
+    <main className="flex flex-col items-center px-4">
+      <Intro />
+      <SectionDivider />
+      <About />
+      <Projects />
+      <Skills />
+      <Contact />
     </main>
   );
 }
