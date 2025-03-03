@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react'
 import { motion } from "framer-motion";
-import { links } from "../lib/data.ts";
-import Link from "next/Link";
+import { links } from "../lib/data";
+import Link from "next/link";
 import clsx from "clsx";
-import useActiveSection from "../context/use-active-state.tsx";
+import useActiveSection from "../context/use-active-state";
 
 export default function Header() {
 

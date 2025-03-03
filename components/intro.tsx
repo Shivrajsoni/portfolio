@@ -2,12 +2,11 @@
 
 import React, { useEffect } from 'react'
 import Image from "next/image";
-import Link from "next/Link";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { BsArrowRight, BsLinkedin } from "react-icons/bs";
 import { HiDownload } from "react-icons/hi";
 import { FaGithubSquare } from "react-icons/fa";
-import { useInView } from "react-intersection-observer";
 import useActiveSection from "../context/use-active-state"
 import { useSectionInView } from "../lib/hook";
 
