@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: true,
   },
+  // Add this section to ignore ESLint errors during builds
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

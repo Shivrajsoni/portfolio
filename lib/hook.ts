@@ -1,7 +1,7 @@
 
 "use client";
 
-import react, { useEffect } from "react";
+import { useEffect } from "react";
 import type { sectionName } from "./types.ts";
 
 import { useInView } from "react-intersection-observer";
