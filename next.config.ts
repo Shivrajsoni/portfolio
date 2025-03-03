@@ -1,3 +1,4 @@
+/** @type {import('next').NextConfig} */
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -12,7 +13,7 @@ const nextConfig: NextConfig = {
 
   },
   experimental: {
-    serverActions: true,
+    serverActions: {},
   },
   // Add this section to ignore ESLint errors during builds
   eslint: {
