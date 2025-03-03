@@ -1,5 +1,5 @@
 
-import links from "./data.ts";
+import { links } from "./data";
 export type sectionName = typeof links[number]["name"];
 
 

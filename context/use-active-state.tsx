@@ -1,28 +1,26 @@
 "use client";
 
-import React,{ useState , createContext , useContext} from 'react'
-import links from "../lib/data.ts"
-import {sectionName} from "../lib/types.ts";
+import React, { useState, createContext, useContext } from 'react';
+
+import { sectionName } from "../lib/types";
 type ActiveStateContextProps = {
-  children:React.ReactNode
+  children: React.ReactNode
 }
 
 type ActiveStateContextProp = {
-  activeState:sectionName,
-  setActiveState:React.Dispatch<React.SetStateAction<sectionName>>,
-  lastTimeClick:number,
-  setLastTimeClick:React.Dispatch<React.SetStateAction<number>>;
+  activeState: sectionName,
+  setActiveState: React.Dispatch<React.SetStateAction<sectionName>>,
+  lastTimeClick: number,
+  setLastTimeClick: React.Dispatch<React.SetStateAction<number>>;
 }
 
- const ActiveStateContext = createContext<ActiveStateContextProp | null>(null);
+const ActiveStateContext = createContext<ActiveStateContextProp | null>(null);
 
-export function UseActiveState({children}:ActiveStateContextProps) {
+export function UseActiveState({ children }: ActiveStateContextProps) {
+  const [activeState, setActiveState] = useState<sectionName>("Home");
+  const [lastTimeClick, setLastTimeClick] = useState(0);
 
-   
-  const [ activeState,setActiveState] = useState<sectionName>("Home");
-  const [lastTimeClick,setLastTimeClick] = useState(0);
-
-  return <ActiveStateContext.Provider value = {{
+  return <ActiveStateContext.Provider value={{
     activeState,
     setActiveState,
     lastTimeClick,
@@ -32,14 +30,14 @@ export function UseActiveState({children}:ActiveStateContextProps) {
   </ActiveStateContext.Provider>;
 }
 
-export default function UseActiveSection(){
+export default function UseActiveSection() {
   const context = useContext(ActiveStateContext);
 
-  if(context==null){
+  if (context == null) {
     throw new Error(
       "useActiveSectionContext must be used within an ActiveSectionContextProvider"
     );
-    
+
   }
   return context;
 }

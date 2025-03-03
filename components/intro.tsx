@@ -15,7 +15,7 @@ import { useSectionInView } from "../lib/hook";
 
 function Intro() {
 
-  const { ref } = useSectionInView("Home", 0.5);
+  const { ref } = useSectionInView("Home", 0.75);
   const { setActiveState, setLastTimeClick } = useActiveSection();
 
   return (
