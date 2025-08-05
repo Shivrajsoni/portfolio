@@ -1,6 +1,7 @@
 "use client";
 import { useTheme } from "next-themes";
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 
 const GITHUB_USERNAME = "Shivrajsoni"; // Change if needed
 const TWITTER_URL = "https://x.com/_callmeXavier_"; // Add your handle
@@ -87,15 +88,31 @@ const Header = () => {
 
   return (
     <header className="w-full flex items-center justify-between px-6 py-4 border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="flex items-center gap-3">
-        <img
-          src={GITHUB_PFP}
-          alt="Shivraj Soni GitHub profile"
-          className="w-10 h-10 rounded-full border border-border shadow-sm"
-        />
-        <span className="font-semibold text-lg md:text-xl text-foreground tracking-tight">
-          Shivraj Soni
-        </span>
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
+          <img
+            src={GITHUB_PFP}
+            alt="Shivraj Soni GitHub profile"
+            className="w-10 h-10 rounded-full border border-border shadow-sm"
+          />
+          <span className="font-semibold text-lg md:text-xl text-foreground tracking-tight">
+            Shivraj Soni
+          </span>
+        </div>
+        <nav className="hidden md:flex items-center gap-6">
+          <Link
+            href="/"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Home
+          </Link>
+          <Link
+            href="/blog"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Blog
+          </Link>
+        </nav>
       </div>
       <div className="flex items-center gap-2">
         {socialLinks.map((link) => (
