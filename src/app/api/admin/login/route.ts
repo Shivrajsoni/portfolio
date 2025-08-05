@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAdminPassword, generateAdminToken } from "@/lib/auth";
+import { verifyAdminCredentials, generateAdminToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    const { password } = await request.json();
+    const { adminId, password } = await request.json();
 
-    // Verify admin password using centralized function
-    if (!verifyAdminPassword(password)) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+    // Verify admin credentials using centralized function
+    if (!verifyAdminCredentials(adminId, password)) {
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 }
+      );
     }
 
     // Generate admin token

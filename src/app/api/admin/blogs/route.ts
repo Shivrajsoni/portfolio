@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { createBlogPost, blogPostExists } from "@/lib/file-operations";
+import {
+  createBlogPost,
+  blogPostExists,
+  updateBlogPost,
+  deleteBlogPost,
+} from "@/lib/file-operations";
+import { getAllBlogs } from "@/lib/blog-utils";
 
 // Simple in-memory rate limiting (in production, use Redis)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -8,7 +14,7 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const windowMs = 15 * 60 * 1000; // 15 minutes
-  const maxRequests = 100; // Max 10 requests per 15 minutes
+  const maxRequests = 100; // Max 100 requests per 15 minutes
 
   const rateLimit = rateLimitMap.get(ip);
 
@@ -25,9 +31,9 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+// POST - Create a new blog post
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
     const ip =
       request.headers.get("x-forwarded-for") ||
       request.headers.get("x-real-ip") ||
@@ -39,7 +45,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check authentication
     const token = request.cookies.get("adminToken")?.value || null;
     if (!isAdminAuthenticated(token)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -48,7 +53,6 @@ export async function POST(request: NextRequest) {
     const { title, excerpt, content, tags, author, featured } =
       await request.json();
 
-    // Validate required fields
     if (!title || !excerpt || !content) {
       return NextResponse.json(
         { error: "Title, excerpt, and content are required" },
@@ -56,13 +60,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate slug from title
     const slug = title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-    // Check if blog post already exists
     if (blogPostExists(slug)) {
       return NextResponse.json(
         { error: `Blog post with title "${title}" already exists` },
@@ -70,28 +72,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create MDX content with proper escaping
-    const escapedExcerpt = excerpt.replace(/"/g, '\\"');
-    const escapedTitle = title.replace(/"/g, '\\"');
-    const escapedAuthor = (author || "Shivraj Soni").replace(/"/g, '\\"');
-
     const mdxContent = `---
-title: "${escapedTitle}"
+title: "${title.replace(/"/g, '"')}"
 date: "${new Date().toISOString().split("T")[0]}"
-excerpt: "${escapedExcerpt}"
-tags: [${tags
+excerpt: "${excerpt.replace(/"/g, '"')}"
+tags: [${(tags || "")
       .split(",")
-      .map((tag: string) => `"${tag.trim()}"`)
+      .map((tag: string) => `"${tag.trim()}"`) // Corrected: Ensure tags are properly quoted within the array
       .join(", ")}]
-author: "${escapedAuthor}"
+author: "${(author || "Shivraj Soni").replace(/"/g, '"')}"
 featured: ${featured || false}
 ---
 
 ${content}`;
 
-    console.log("Creating blog post with content:", mdxContent);
-
-    // Create the blog post file
     const success = createBlogPost(slug, mdxContent);
 
     if (!success) {
@@ -105,7 +99,6 @@ ${content}`;
       success: true,
       message: "Blog post created successfully",
       slug,
-      filePath: `src/content/blog/${slug}.mdx`,
     });
   } catch (error) {
     console.error("Error creating blog post:", error);
@@ -116,21 +109,141 @@ ${content}`;
   }
 }
 
+// GET - Retrieve all blog posts
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
     const token = request.cookies.get("adminToken")?.value || null;
     if (!isAdminAuthenticated(token)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Import getAllBlogs dynamically to avoid server/client issues
-    const { getAllBlogs } = await import("@/lib/blog-utils");
     const blogs = await getAllBlogs();
-
     return NextResponse.json({ blogs });
   } catch (error) {
     console.error("Error fetching blogs:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT - Update an existing blog post
+export async function PUT(request: NextRequest) {
+  try {
+    const ip =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    const token = request.cookies.get("adminToken")?.value || null;
+    if (!isAdminAuthenticated(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { slug, title, excerpt, content, tags, author, featured } =
+      await request.json();
+
+    if (!slug || !title || !excerpt || !content) {
+      return NextResponse.json(
+        { error: "Slug, title, excerpt, and content are required" },
+        { status: 400 }
+      );
+    }
+
+    if (!blogPostExists(slug)) {
+      return NextResponse.json(
+        { error: `Blog post with slug "${slug}" not found` },
+        { status: 404 }
+      );
+    }
+
+    const mdxContent = `---
+title: "${title.replace(/"/g, '"')}"
+date: "${new Date().toISOString().split("T")[0]}"
+excerpt: "${excerpt.replace(/"/g, '"')}"
+tags: [${(tags || "")
+      .split(",")
+      .map((tag: string) => `"${tag.trim()}"`) // Corrected: Ensure tags are properly quoted within the array
+      .join(", ")}]
+author: "${(author || "Shivraj Soni").replace(/"/g, '"')}"
+featured: ${featured || false}
+---
+
+${content}`;
+
+    const success = updateBlogPost(slug, mdxContent);
+
+    if (!success) {
+      return NextResponse.json(
+        { error: "Failed to update blog post" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Blog post updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating blog post:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE - Delete a blog post
+export async function DELETE(request: NextRequest) {
+  try {
+    const ip =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    const token = request.cookies.get("adminToken")?.value || null;
+    if (!isAdminAuthenticated(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { slug } = await request.json();
+
+    if (!slug) {
+      return NextResponse.json({ error: "Slug is required" }, { status: 400 });
+    }
+
+    if (!blogPostExists(slug)) {
+      return NextResponse.json(
+        { error: `Blog post with slug "${slug}" not found` },
+        { status: 404 }
+      );
+    }
+
+    const success = deleteBlogPost(slug);
+
+    if (!success) {
+      return NextResponse.json(
+        { error: "Failed to delete blog post" },
+        { status: 500 }
+      );
+    }
+
+    return new Response(null, { status: 204 }); // No Content
+  } catch (error) {
+    console.error("Error deleting blog post:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

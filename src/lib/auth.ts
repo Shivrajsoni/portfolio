@@ -10,6 +10,7 @@ export interface AdminUser {
 
 // Admin credentials (in production, use environment variables)
 const ADMIN_CREDENTIALS = {
+  id: process.env.ADMIN_ID || "admin",
   password: process.env.ADMIN_PASSWORD || "admin123",
   token: process.env.ADMIN_TOKEN || "your-secret-admin-token",
 };
@@ -20,9 +21,9 @@ export function isAdminAuthenticated(token: string | null): boolean {
   return token === ADMIN_CREDENTIALS.token;
 }
 
-// Verify admin password
-export function verifyAdminPassword(password: string): boolean {
-  return password === ADMIN_CREDENTIALS.password;
+// Verify admin credentials
+export function verifyAdminCredentials(adminId: string, password: string): boolean {
+  return adminId === ADMIN_CREDENTIALS.id && password === ADMIN_CREDENTIALS.password;
 }
 
 // Generate admin token

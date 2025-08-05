@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const AdminLogin = () => {
+  const [adminId, setAdminId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ const AdminLogin = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ adminId, password }),
       });
 
       if (response.ok) {
@@ -27,7 +28,7 @@ const AdminLogin = () => {
         router.push("/admin");
       } else {
         const { error } = await response.json();
-        setError(error || "Invalid password");
+        setError(error || "Invalid credentials");
       }
     } catch (error) {
       setError("Login failed. Please try again.");
@@ -47,10 +48,26 @@ const AdminLogin = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
+                htmlFor="adminId"
+                className="block text-sm font-medium text-foreground mb-2"
+              >
+                Admin ID
+              </label>
+              <input
+                type="text"
+                id="adminId"
+                value={adminId}
+                onChange={(e) => setAdminId(e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                required
+              />
+            </div>
+            <div>
+              <label
                 htmlFor="password"
                 className="block text-sm font-medium text-foreground mb-2"
               >
-                Admin Password
+                Password
               </label>
               <input
                 type="password"
