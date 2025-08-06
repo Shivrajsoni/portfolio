@@ -112,6 +112,18 @@ const Header = () => {
           >
             Blog
           </Link>
+          <Link
+            href="/projects"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Projects
+          </Link>
+          <Link
+            href="/proof-of-work"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Proof of Work
+          </Link>
         </nav>
       </div>
       <div className="flex items-center gap-2">

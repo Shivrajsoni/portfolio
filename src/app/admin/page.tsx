@@ -1,93 +1,105 @@
 "use client";
-import React from "react";
+
 import Link from "next/link";
-import { Book, Briefcase, Trophy } from "lucide-react";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Book, Briefcase, Trophy, ArrowRight } from "lucide-react";
 
-const AdminDashboard = () => {
+const dashboardItems = [
+  {
+    href: "/admin/blogs",
+    icon: Book,
+    title: "Blog Management",
+    description: "Create, edit, and manage your blog posts.",
+  },
+  {
+    href: "/admin/projects",
+    icon: Briefcase,
+    title: "Project Showcase",
+    description: "Add and manage your portfolio projects.",
+  },
+  {
+    href: "/admin/proof-of-work",
+    icon: Trophy,
+    title: "Proof of Work",
+    description: "Showcase your achievements and certifications.",
+  },
+];
+
+const stats = [
+  { title: "Total Blogs", value: "2" },
+  { title: "Total Projects", value: "0" },
+  { title: "Certifications", value: "0" },
+];
+
+export default function AdminDashboard() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-foreground mb-8">
-        Welcome, Admin!
-      </h1>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h1 className="text-3xl font-bold text-foreground mb-8">Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Blog Management Card */}
-        <Link
-          href="/admin/blogs"
-          className="block bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
-        >
-          <div className="flex items-center gap-4 mb-4">
-            <Book className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-semibold text-foreground">
-              Blog Management
-            </h2>
-          </div>
-          <p className="text-muted-foreground">
-            Create, edit, and manage your blog posts.
-          </p>
-        </Link>
-
-        {/* Project Management Card */}
-        <Link
-          href="/admin/projects"
-          className="block bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
-        >
-          <div className="flex items-center gap-4 mb-4">
-            <Briefcase className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-semibold text-foreground">
-              Project Showcase
-            </h2>
-          </div>
-          <p className="text-muted-foreground">
-            Add and manage your portfolio projects.
-          </p>
-        </Link>
-
-        {/* Proof of Work Card */}
-        <Link
-          href="/admin/proof-of-work"
-          className="block bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
-        >
-          <div className="flex items-center gap-4 mb-4">
-            <Trophy className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-semibold text-foreground">
-              Proof of Work
-            </h2>
-          </div>
-          <p className="text-muted-foreground">
-            Showcase your achievements and certifications.
-          </p>
-        </Link>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {dashboardItems.map((item, index) => (
+          <motion.div
+            key={item.href}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <Link href={item.href}>
+              <Card className="hover:shadow-lg transition-shadow h-full flex flex-col">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-semibold">
+                    {item.title}
+                  </CardTitle>
+                  <item.icon className="w-6 h-6 text-muted-foreground" />
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <p className="text-muted-foreground">{item.description}</p>
+                </CardContent>
+                <div className="p-6 pt-0">
+                  <div className="flex items-center text-primary hover:underline">
+                    <span>Go to {item.title}</span>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          </motion.div>
+        ))}
       </div>
 
-      {/* Quick Stats */}
-      <div className="mt-12">
+      <div>
         <h2 className="text-2xl font-semibold text-foreground mb-6">
           Quick Stats
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-muted-foreground mb-2">
-              Total Blogs
-            </h3>
-            <p className="text-4xl font-bold text-primary">2</p>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-muted-foreground mb-2">
-              Total Projects
-            </h3>
-            <p className="text-4xl font-bold text-primary">0</p>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-muted-foreground mb-2">
-              Certifications
-            </h3>
-            <p className="text-4xl font-bold text-primary">0</p>
-          </div>
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-muted-foreground">
+                    {stat.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-4xl font-bold text-primary">
+                    {stat.value}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
-};
-
-export default AdminDashboard;
+}

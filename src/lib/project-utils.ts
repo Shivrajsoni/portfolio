@@ -5,11 +5,11 @@ import { remark } from "remark";
 import html from "remark-html";
 
 // Fallback for different environments
-const getBlogDirectory = () => {
+const getProjectDirectory = () => {
   const possiblePaths = [
-    path.join(process.cwd(), "src/content/blog"),
-    path.join(process.cwd(), "content/blog"),
-    path.join(__dirname, "../content/blog"),
+    path.join(process.cwd(), "src/content/projects"),
+    path.join(process.cwd(), "content/projects"),
+    path.join(__dirname, "../content/projects"),
   ];
 
   for (const dir of possiblePaths) {
@@ -21,7 +21,7 @@ const getBlogDirectory = () => {
   return possiblePaths[0]; // Return default path
 };
 
-export interface BlogPost {
+export interface ProjectPost {
   slug: string;
   title: string;
   date: string;
@@ -33,7 +33,7 @@ export interface BlogPost {
   featured?: boolean;
 }
 
-export interface BlogMeta {
+export interface ProjectMeta {
   slug: string;
   title: string;
   date: string;
@@ -52,19 +52,17 @@ function calculateReadTime(content: string): string {
   return `${minutes} min read`;
 }
 
-// Get all blog posts metadata (for listing)
-export async function getAllBlogs(): Promise<BlogMeta[]> {
+// Get all project posts metadata (for listing)
+export async function getAllProjects(): Promise<ProjectMeta[]> {
   try {
-    const actualBlogDirectory = getBlogDirectory();
-    // console.log("Blog directory path:", actualBlogDirectory);
-    const fileNames = fs.readdirSync(actualBlogDirectory);
-    //console.log("Found files:", fileNames);
+    const actualProjectDirectory = getProjectDirectory();
+    const fileNames = fs.readdirSync(actualProjectDirectory);
 
     const allPostsData = fileNames
       .filter((fileName) => fileName.endsWith(".mdx"))
       .map((fileName) => {
         const slug = fileName.replace(/\.mdx$/, "");
-        const fullPath = path.join(actualBlogDirectory, fileName);
+        const fullPath = path.join(actualProjectDirectory, fileName);
         const fileContents = fs.readFileSync(fullPath, "utf8");
         const { data, content } = matter(fileContents);
 
@@ -83,16 +81,16 @@ export async function getAllBlogs(): Promise<BlogMeta[]> {
 
     return allPostsData;
   } catch (error) {
-    console.error("Error reading blog directory:", error);
+    console.error("Error reading project directory:", error);
     return [];
   }
 }
 
-// Get a single blog post by slug
-export async function getBlogBySlug(slug: string): Promise<BlogPost | null> {
+// Get a single project post by slug
+export async function getProjectBySlug(slug: string): Promise<ProjectPost | null> {
   try {
-    const actualBlogDirectory = getBlogDirectory();
-    const fullPath = path.join(actualBlogDirectory, `${slug}.mdx`);
+    const actualProjectDirectory = getProjectDirectory();
+    const fullPath = path.join(actualProjectDirectory, `${slug}.mdx`);
 
     if (!fs.existsSync(fullPath)) {
       return null;
@@ -117,33 +115,33 @@ export async function getBlogBySlug(slug: string): Promise<BlogPost | null> {
       featured: data.featured || false,
     };
   } catch (error) {
-    console.error(`Error reading blog post ${slug}:`, error);
+    console.error(`Error reading project post ${slug}:`, error);
     return null;
   }
 }
 
-// Get all blog slugs (for static generation)
-export function getAllBlogSlugs(): string[] {
+// Get all project slugs (for static generation)
+export function getAllProjectSlugs(): string[] {
   try {
-    const actualBlogDirectory = getBlogDirectory();
-    const fileNames = fs.readdirSync(actualBlogDirectory);
+    const actualProjectDirectory = getProjectDirectory();
+    const fileNames = fs.readdirSync(actualProjectDirectory);
     return fileNames
       .filter((fileName) => fileName.endsWith(".mdx"))
       .map((fileName) => fileName.replace(/\.mdx$/, ""));
   } catch (error) {
-    console.error("Error reading blog slugs:", error);
+    console.error("Error reading project slugs:", error);
     return [];
   }
 }
 
-// Get featured blog posts
-export async function getFeaturedBlogs(): Promise<BlogMeta[]> {
-  const allBlogs = await getAllBlogs();
-  return allBlogs.filter((blog) => blog.featured);
+// Get featured project posts
+export async function getFeaturedProjects(): Promise<ProjectMeta[]> {
+  const allProjects = await getAllProjects();
+  return allProjects.filter((project) => project.featured);
 }
 
-// Get blogs by tag
-export async function getBlogsByTag(tag: string): Promise<BlogMeta[]> {
-  const allBlogs = await getAllBlogs();
-  return allBlogs.filter((blog) => blog.tags.includes(tag));
+// Get projects by tag
+export async function getProjectsByTag(tag: string): Promise<ProjectMeta[]> {
+  const allProjects = await getAllProjects();
+  return allProjects.filter((project) => project.tags.includes(tag));
 }

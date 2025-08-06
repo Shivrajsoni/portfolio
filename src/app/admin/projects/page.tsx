@@ -1,24 +1,33 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import type { BlogMeta as BlogMetaType } from "@/lib/blog-utils";
+import { motion } from "framer-motion";
+import matter from "gray-matter";
+import type { ProjectMeta as ProjectMetaType } from "@/lib/project-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 
-// Extend the BlogMeta type to optionally include the full content
-interface BlogMeta extends BlogMetaType {
+// Extend the ProjectMeta type to optionally include the full content
+interface ProjectMeta extends ProjectMetaType {
   content?: string;
 }
 
-const BlogManagement = () => {
-  const [blogs, setBlogs] = useState<BlogMeta[]>([]);
+const ProjectManagement = () => {
+  const [projects, setProjects] = useState<ProjectMeta[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingBlog, setEditingBlog] = useState<BlogMeta | null>(null);
+  const [editingProject, setEditingProject] = useState<ProjectMeta | null>(
+    null
+  );
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",
@@ -30,29 +39,29 @@ const BlogManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Function to fetch all blogs
-  const loadBlogs = async () => {
+  // Function to fetch all projects
+  const loadProjects = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/admin/blogs");
+      const response = await fetch("/api/admin/projects");
       if (response.ok) {
-        const { blogs: fetchedBlogs } = await response.json();
-        setBlogs(fetchedBlogs);
+        const { projects: fetchedProjects } = await response.json();
+        setProjects(fetchedProjects);
       } else {
-        console.error("Failed to load blogs");
-        alert("Error: Could not load blogs.");
+        console.error("Failed to load projects");
+        alert("Error: Could not load projects.");
       }
     } catch (error) {
-      console.error("Error loading blogs:", error);
-      alert("An unexpected error occurred while loading blogs.");
+      console.error("Error loading projects:", error);
+      alert("An unexpected error occurred while loading projects.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Load blogs on initial component mount
+  // Load projects on initial component mount
   useEffect(() => {
-    loadBlogs();
+    loadProjects();
   }, []);
 
   // Function to clear and reset the form
@@ -65,60 +74,74 @@ const BlogManagement = () => {
       author: "Shivraj Soni",
       featured: false,
     });
-    setEditingBlog(null);
+    setEditingProject(null);
     setShowCreateForm(false);
   };
 
   // Handler for clicking the "Edit" button
-  const handleEditClick = async (blog: BlogMeta) => {
+  const handleEditClick = async (project: ProjectMeta) => {
     setShowCreateForm(true);
-    setEditingBlog(blog);
+    setEditingProject(project);
+
+    // Set initial form data with existing metadata
     setFormData({
-      title: blog.title,
-      excerpt: blog.excerpt,
+      title: project.title,
+      excerpt: project.excerpt,
       content: "Loading content...", // Placeholder while fetching
-      tags: blog.tags.join(", "),
-      author: blog.author || "Shivraj Soni",
-      featured: blog.featured || false,
+      tags: project.tags.join(", "),
+      author: project.author || "Shivraj Soni",
+      featured: project.featured || false,
     });
 
     try {
-      const response = await fetch(`/api/admin/blogs/${blog.slug}`);
-      if (!response.ok) throw new Error("Failed to load blog content");
-      const { blog: fullBlog } = await response.json();
-      setFormData((prevData) => ({
-        ...prevData,
-        content: fullBlog.content || "",
-      }));
+      // Fetch the full project data, including raw content
+      const response = await fetch(`/api/admin/projects/${project.slug}`);
+      if (!response.ok) {
+        throw new Error("Failed to load project content for editing.");
+      }
+      const { project: fullProject } = await response.json();
+
+      // The API returns the full raw MDX content.
+      // We use gray-matter to parse it into data (frontmatter) and content (body).
+      const { data, content } = matter(fullProject.content);
+
+      // Update the form with the fetched data
+      setFormData({
+        title: data.title || "",
+        excerpt: data.excerpt || "",
+        tags: (data.tags || []).join(", "),
+        author: data.author || "Shivraj Soni",
+        featured: data.featured || false,
+        content: content, // This is now just the markdown body
+      });
     } catch (error) {
-      console.error("Error loading blog content:", error);
-      alert("Error: Could not load blog content for editing.");
-      resetForm();
+      console.error("Error loading project content:", error);
+      alert("Error: Could not load project content for editing.");
+      resetForm(); // Reset form on error
     }
   };
 
-  // Handler for deleting a blog post
+  // Handler for deleting a project
   const handleDeleteClick = async (slug: string) => {
     if (
       window.confirm(
-        "Are you sure you want to delete this blog post? This action cannot be undone."
+        "Are you sure you want to delete this project? This action cannot be undone."
       )
     ) {
       try {
-        const response = await fetch(`/api/admin/blogs/${slug}`, {
+        const response = await fetch(`/api/admin/projects/${slug}`, {
           method: "DELETE",
         });
 
         if (response.ok) {
-          alert("Blog post deleted successfully!");
-          loadBlogs();
+          alert("Project deleted successfully!");
+          loadProjects();
         } else {
           const result = await response.json();
           throw new Error(result.error || "Unknown error");
         }
       } catch (error) {
-        console.error("Error deleting blog:", error);
-        alert(`Error deleting blog: ${error.message}`);
+        console.error("Error deleting project:", error);
       }
     }
   };
@@ -128,10 +151,10 @@ const BlogManagement = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const method = editingBlog ? "PUT" : "POST";
-    const url = editingBlog
-      ? `/api/admin/blogs/${editingBlog.slug}`
-      : "/api/admin/blogs";
+    const method = editingProject ? "PUT" : "POST";
+    const url = editingProject
+      ? `/api/admin/projects/${editingProject.slug}`
+      : "/api/admin/projects";
 
     const body = JSON.stringify(formData);
 
@@ -148,21 +171,16 @@ const BlogManagement = () => {
       }
 
       alert(
-        `Blog post "${formData.title}" ${
-          editingBlog ? "updated" : "created"
+        `Project "${formData.title}" ${
+          editingProject ? "updated" : "created"
         } successfully!`
       );
       resetForm();
-      loadBlogs();
+      loadProjects();
     } catch (error) {
       console.error(
-        `Error ${editingBlog ? "updating" : "creating"} blog:`,
+        `Error ${editingProject ? "updating" : "creating"} project:`,
         error
-      );
-      alert(
-        `Failed to ${editingBlog ? "update" : "create"} blog post: ${
-          error.message
-        }`
       );
     } finally {
       setIsSubmitting(false);
@@ -176,18 +194,20 @@ const BlogManagement = () => {
       transition={{ duration: 0.5 }}
     >
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Blog Management</h1>
+        <h1 className="text-3xl font-bold text-foreground">
+          Project Management
+        </h1>
         <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
           <DialogTrigger asChild>
             <Button onClick={() => setShowCreateForm(true)}>
               <PlusCircle className="mr-2 h-4 w-4" />
-              Create New Blog
+              Create New Project
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingBlog ? "Edit Blog Post" : "Create New Blog Post"}
+                {editingProject ? "Edit Project" : "Create New Project"}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -238,7 +258,7 @@ const BlogManagement = () => {
                   rows={15}
                   required
                   disabled={isSubmitting}
-                  placeholder="# Your blog content here..."
+                  placeholder="# Your project content here..."
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -250,17 +270,22 @@ const BlogManagement = () => {
                   }
                   disabled={isSubmitting}
                 />
-                <label htmlFor="featured">Featured Post</label>
+                <label htmlFor="featured">Featured Project</label>
               </div>
               <div className="flex gap-4">
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting
                     ? "Saving..."
-                    : editingBlog
-                    ? "Update Blog Post"
-                    : "Create Blog Post"}
+                    : editingProject
+                    ? "Update Project"
+                    : "Create Project"}
                 </Button>
-                <Button type="button" variant="outline" onClick={resetForm} disabled={isSubmitting}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={resetForm}
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </Button>
               </div>
@@ -271,39 +296,41 @@ const BlogManagement = () => {
 
       <div>
         <h2 className="text-xl font-semibold text-foreground mb-6">
-          Existing Blogs
+          Existing Projects
         </h2>
         {isLoading ? (
-          <p>Loading blogs...</p>
+          <p>Loading projects...</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {blogs.map((blog) => (
+            {projects.map((project) => (
               <motion.div
-                key={blog.slug}
+                key={project.slug}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
                 <Card>
                   <CardHeader>
-                    <CardTitle>{blog.title}</CardTitle>
+                    <CardTitle>{project.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground mb-4">{blog.excerpt}</p>
+                    <p className="text-muted-foreground mb-4">
+                      {project.excerpt}
+                    </p>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{blog.date}</span>
+                      <span>{project.date}</span>
                       <span>•</span>
-                      <span>{blog.readTime}</span>
-                      {blog.featured && (
+                      <span>{project.readTime}</span>
+                      {project.featured && (
                         <>
                           <span>•</span>
                           <span className="text-primary">Featured</span>
                         </>
                       )}
                     </div>
-                    {blog.tags.length > 0 && (
+                    {project.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-4">
-                        {blog.tags.map((tag) => (
+                        {project.tags.map((tag) => (
                           <span
                             key={tag}
                             className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded-md"
@@ -315,10 +342,18 @@ const BlogManagement = () => {
                     )}
                   </CardContent>
                   <div className="p-6 pt-0 flex justify-end gap-2">
-                    <Button variant="outline" size="icon" onClick={() => handleEditClick(blog)}>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleEditClick(project)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="destructive" size="icon" onClick={() => handleDeleteClick(blog.slug)}>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleDeleteClick(project.slug)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -332,4 +367,4 @@ const BlogManagement = () => {
   );
 };
 
-export default BlogManagement;
+export default ProjectManagement;
