@@ -7,7 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 
 // Extend the BlogMeta type to optionally include the full content
@@ -118,7 +124,6 @@ const BlogManagement = () => {
         }
       } catch (error) {
         console.error("Error deleting blog:", error);
-        alert(`Error deleting blog: ${error.message}`);
       }
     }
   };
@@ -158,11 +163,6 @@ const BlogManagement = () => {
       console.error(
         `Error ${editingBlog ? "updating" : "creating"} blog:`,
         error
-      );
-      alert(
-        `Failed to ${editingBlog ? "update" : "create"} blog post: ${
-          error.message
-        }`
       );
     } finally {
       setIsSubmitting(false);
@@ -260,7 +260,12 @@ const BlogManagement = () => {
                     ? "Update Blog Post"
                     : "Create Blog Post"}
                 </Button>
-                <Button type="button" variant="outline" onClick={resetForm} disabled={isSubmitting}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={resetForm}
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </Button>
               </div>
@@ -315,10 +320,18 @@ const BlogManagement = () => {
                     )}
                   </CardContent>
                   <div className="p-6 pt-0 flex justify-end gap-2">
-                    <Button variant="outline" size="icon" onClick={() => handleEditClick(blog)}>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleEditClick(blog)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="destructive" size="icon" onClick={() => handleDeleteClick(blog.slug)}>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleDeleteClick(blog.slug)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

@@ -3,7 +3,7 @@ import { isAdminAuthenticated } from "@/lib/auth";
 import { getBlogBySlug } from "@/lib/blog-utils";
 
 export async function GET(
-  request: NextRequest,
+  request: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
