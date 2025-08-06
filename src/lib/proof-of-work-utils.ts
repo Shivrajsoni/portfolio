@@ -100,7 +100,9 @@ export async function getAllProofOfWork(): Promise<ProofOfWorkMeta[]> {
       };
     })
     .filter(Boolean)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) as ProofOfWorkMeta[];
+    .sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    ) as ProofOfWorkMeta[];
 
   return allPostsData;
 }

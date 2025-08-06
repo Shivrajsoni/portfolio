@@ -17,11 +17,19 @@ const ProofOfWorkPage = async () => {
       ) : (
         <div className="space-y-8">
           {allProofOfWork.map((entry) => (
-            <Card key={entry.slug} className="w-full hover:shadow-lg transition-shadow duration-200 ease-in-out">
+            <Card
+              key={entry.slug}
+              className="w-full hover:shadow-lg transition-shadow duration-200 ease-in-out"
+            >
               <CardHeader>
                 <CardTitle className="text-2xl font-bold leading-tight">
                   {entry.liveLink ? (
-                    <a href={entry.liveLink} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    <a
+                      href={entry.liveLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
                       {entry.title}
                     </a>
                   ) : (
@@ -30,9 +38,7 @@ const ProofOfWorkPage = async () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  {entry.excerpt}
-                </p>
+                <p className="text-muted-foreground mb-4">{entry.excerpt}</p>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mb-4">
                   <span>{entry.date}</span>
                   <span>•</span>
