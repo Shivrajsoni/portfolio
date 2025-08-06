@@ -65,6 +65,13 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      backgroundImage: {
+        'linear-to-b': 'linear-gradient(to bottom, var(--tw-gradient-stops))',
+      },
+      boxShadow: {
+        'custom-light': '0_2px_20px_-2px_rgba(0,0,0,0.1)',
+        'custom-dark': '0_2px_20px_-2px_rgba(0,0,0,0.3)', // Adjusted for dark mode
+      },
     },
   },
   plugins: [],
