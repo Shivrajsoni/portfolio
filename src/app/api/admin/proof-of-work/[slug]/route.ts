@@ -36,9 +36,9 @@ export async function PUT(
     const data = await request.json();
 
     // Basic validation
-    if (!data.title || !data.content || !data.excerpt || !data.tags) {
+    if (!data.title || !data.content || !data.excerpt || !data.tags || !data.type) {
       return NextResponse.json(
-        { error: "Missing required fields (title, content, excerpt, tags)" },
+        { error: "Missing required fields (title, content, excerpt, tags, type)" },
         { status: 400 }
       );
     }

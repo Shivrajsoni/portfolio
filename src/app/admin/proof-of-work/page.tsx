@@ -22,6 +22,10 @@ interface ProofOfWorkMeta extends ProofOfWorkMetaType {
   content?: string;
 }
 
+const proofOfWorkTypes = ["oss", "bounty", "mentions"] as const;
+
+type ProofOfWorkType = (typeof proofOfWorkTypes)[number];
+
 const ProofOfWorkManagement = () => {
   const [proofOfWorkEntries, setProofOfWorkEntries] = useState<
     ProofOfWorkMeta[]
@@ -29,11 +33,16 @@ const ProofOfWorkManagement = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProofOfWork, setEditingProofOfWork] =
     useState<ProofOfWorkMeta | null>(null);
+  type Type = {
+    oss: string;
+    bounty: string;
+  };
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",
     content: "",
     tags: "",
+    type: "oss" as ProofOfWorkType,
     liveLink: "",
     organization: "",
     hardnessLevel: "",
@@ -75,6 +84,7 @@ const ProofOfWorkManagement = () => {
       title: "",
       excerpt: "",
       content: "",
+      type: "oss" as ProofOfWorkType,
       tags: "",
       liveLink: "",
       organization: "",
@@ -93,6 +103,7 @@ const ProofOfWorkManagement = () => {
       title: entry.title,
       excerpt: entry.excerpt,
       content: "Loading content...", // Placeholder while fetching
+      type: entry.type,
       tags: entry.tags.join(", "),
       liveLink: entry.liveLink || "",
       organization: entry.organization || "",
@@ -247,6 +258,18 @@ const ProofOfWorkManagement = () => {
                 />
               </div>
               <div>
+                <label htmlFor="type">Type</label>
+                <Textarea
+                  id="type"
+                  value={formData.type}
+                  onChange={(e) =>
+                    setFormData({ ...formData, type: e.target.value })
+                  }
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div>
                 <label htmlFor="liveLink">Live Link (URL)</label>
                 <Input
                   id="liveLink"
@@ -385,7 +408,9 @@ const ProofOfWorkManagement = () => {
                       {entry.featured && (
                         <>
                           <span>•</span>
-                          <span className="text-primary font-medium">Featured</span>
+                          <span className="text-primary font-medium">
+                            Featured
+                          </span>
                         </>
                       )}
                     </div>
@@ -412,7 +437,6 @@ const ProofOfWorkManagement = () => {
                         ))}
                       </div>
                     )}
-                    
                   </CardContent>
                   <div className="p-6 pt-0 flex justify-end gap-2">
                     <Button

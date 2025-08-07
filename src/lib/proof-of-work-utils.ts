@@ -26,8 +26,11 @@ const getProofOfWorkDirectory = () => {
   return defaultPath;
 };
 
+export type ProofOfWorkType = "oss" | "bounty" | "mentions";
+
 export interface ProofOfWorkPost {
   slug: string;
+  type: ProofOfWorkType;
   title: string;
   date: string;
   excerpt: string;
@@ -43,6 +46,7 @@ export interface ProofOfWorkPost {
 export interface ProofOfWorkMeta {
   slug: string;
   title: string;
+  type: ProofOfWorkType;
   date: string;
   excerpt: string;
   readTime: string;
@@ -89,6 +93,7 @@ export async function getAllProofOfWork(): Promise<ProofOfWorkMeta[]> {
       return {
         slug,
         title: data.title || "Untitled",
+        type: data.type || "oss",
         date: data.date || new Date().toISOString().split("T")[0],
         excerpt: data.excerpt || content.slice(0, 150) + "...",
         readTime: calculateReadTime(content),
@@ -135,6 +140,7 @@ export async function getProofOfWorkBySlug(
   return {
     slug,
     title: data.title || "Untitled",
+    type: data.type || "oss",
     date: data.date || new Date().toISOString().split("T")[0],
     excerpt: data.excerpt || content.slice(0, 150) + "...",
     content: contentHtml,
@@ -182,6 +188,7 @@ export async function createProofOfWork(
 
   const frontMatter = {
     title: data.title,
+    type: data.type,
     date: data.date || new Date().toISOString().split("T")[0],
     excerpt: data.excerpt,
     tags: data.tags,
@@ -222,6 +229,7 @@ export async function updateProofOfWork(
 
   const frontMatter = {
     title: data.title,
+    type: data.type,
     date: data.date || new Date().toISOString().split("T")[0],
     excerpt: data.excerpt,
     tags: data.tags,
