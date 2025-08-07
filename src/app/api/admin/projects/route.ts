@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, excerpt, content, tags, author, featured } =
+    const { title, excerpt, content, tags, author, featured, liveLink } =
       await request.json();
 
     if (!title || !excerpt || !content) {
@@ -56,6 +56,7 @@ tags: [${tags
       .join(", ")}]
 author: "${author}"
 featured: ${featured}
+${liveLink ? `liveLink: "${liveLink}"` : ""}
 ---
 
 ${content}`;

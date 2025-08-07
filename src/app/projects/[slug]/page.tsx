@@ -23,6 +23,18 @@ const ProjectPage = async ({ params }: { params: { slug: string } }) => {
           <span className="mx-2">•</span>
           <span>{project.readTime}</span>
         </div>
+        {project.liveLink && (
+          <div className="mb-8">
+            <a
+              href={project.liveLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            >
+              View Live Project
+            </a>
+          </div>
+        )}
         <div dangerouslySetInnerHTML={{ __html: project.content }} />
       </article>
     </div>

@@ -35,6 +35,7 @@ const ProjectManagement = () => {
     tags: "",
     author: "Shivraj Soni",
     featured: false,
+    liveLink: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -112,6 +113,7 @@ const ProjectManagement = () => {
         tags: (data.tags || []).join(", "),
         author: data.author || "Shivraj Soni",
         featured: data.featured || false,
+        liveLink: data.liveLink || "",
         content: content, // This is now just the markdown body
       });
     } catch (error) {
@@ -204,7 +206,7 @@ const ProjectManagement = () => {
               Create New Project
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-3xl">
             <DialogHeader>
               <DialogTitle>
                 {editingProject ? "Edit Project" : "Create New Project"}
@@ -244,6 +246,18 @@ const ProjectManagement = () => {
                     setFormData({ ...formData, tags: e.target.value })
                   }
                   placeholder="Next.js, React, Web Development"
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div>
+                <label htmlFor="liveLink">Live Link</label>
+                <Input
+                  id="liveLink"
+                  value={formData.liveLink}
+                  onChange={(e) =>
+                    setFormData({ ...formData, liveLink: e.target.value })
+                  }
+                  placeholder="https://my-project.com"
                   disabled={isSubmitting}
                 />
               </div>

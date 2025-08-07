@@ -31,6 +31,7 @@ export interface ProjectPost {
   tags: string[];
   author?: string;
   featured?: boolean;
+  liveLink?: string;
 }
 
 export interface ProjectMeta {
@@ -42,6 +43,7 @@ export interface ProjectMeta {
   tags: string[];
   author?: string;
   featured?: boolean;
+  liveLink?: string;
 }
 
 // Calculate reading time based on content length
@@ -75,6 +77,7 @@ export async function getAllProjects(): Promise<ProjectMeta[]> {
           tags: data.tags || [],
           author: data.author,
           featured: data.featured || false,
+          liveLink: data.liveLink,
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -87,7 +90,9 @@ export async function getAllProjects(): Promise<ProjectMeta[]> {
 }
 
 // Get a single project post by slug
-export async function getProjectBySlug(slug: string): Promise<ProjectPost | null> {
+export async function getProjectBySlug(
+  slug: string
+): Promise<ProjectPost | null> {
   try {
     const actualProjectDirectory = getProjectDirectory();
     const fullPath = path.join(actualProjectDirectory, `${slug}.mdx`);
@@ -113,6 +118,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectPost | null
       tags: data.tags || [],
       author: data.author,
       featured: data.featured || false,
+      liveLink: data.liveLink,
     };
   } catch (error) {
     console.error(`Error reading project post ${slug}:`, error);
