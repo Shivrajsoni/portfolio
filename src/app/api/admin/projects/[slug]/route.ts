@@ -12,7 +12,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 // GET - Retrieve a single project post by slug
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params: { slug } }: { params: { slug: string } }
 ) {
   try {
     const ip =
@@ -31,7 +31,6 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { slug } = params;
     if (!slug) {
       return NextResponse.json({ error: "Slug is required" }, { status: 400 });
     }
@@ -66,7 +65,7 @@ export async function GET(
 
     return NextResponse.json({ project: projectWithRawContent });
   } catch (error) {
-    console.error(`Error fetching project ${params.slug}:`, error);
+    console.error(`Error fetching project ${slug}:`, error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -77,7 +76,7 @@ export async function GET(
 // PUT - Update an existing project post
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params: { slug } }: { params: { slug: string } }
 ) {
   try {
     const ip =
@@ -106,7 +105,6 @@ export async function PUT(
       );
     }
 
-    const slug = params.slug;
     if (!projectPostExists(slug)) {
       return NextResponse.json(
         { error: `Project post with slug "${slug}" not found` },
@@ -121,7 +119,7 @@ date: "${new Date().toISOString().split("T")[0]}"
 tags: [${tags
       .split(",")
       //@ts-ignore
-      .map((tag) => `"${tag.trim()}"`)
+      .map((tag) => JSON.stringify(tag.trim()))
       .join(", ")}]
 author: "${author}"
 featured: ${featured}
@@ -143,7 +141,7 @@ ${content}`;
       );
     }
   } catch (error) {
-    console.error(`Error updating project ${params.slug}:`, error);
+    console.error(`Error updating project ${slug}:`, error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -154,7 +152,7 @@ ${content}`;
 // DELETE - Delete a project post
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params: { slug } }: { params: { slug: string } }
 ) {
   try {
     const ip =
@@ -173,7 +171,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const slug = params.slug;
     if (!projectPostExists(slug)) {
       return NextResponse.json(
         { error: `Project post with slug "${slug}" not found` },
@@ -194,7 +191,7 @@ export async function DELETE(
       );
     }
   } catch (error) {
-    console.error(`Error deleting project ${params.slug}:`, error);
+    console.error(`Error deleting project ${slug}:`, error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

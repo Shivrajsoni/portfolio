@@ -52,7 +52,7 @@ date: "${new Date().toISOString().split("T")[0]}"
 tags: [${tags
       .split(",")
       //@ts-ignore
-      .map((tag) => `"${tag.trim()}"`)
+      .map((tag) => JSON.stringify(tag.trim()))
       .join(", ")}]
 author: "${author}"
 featured: ${featured}
