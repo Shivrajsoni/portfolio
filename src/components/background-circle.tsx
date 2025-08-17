@@ -1,12 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import clsx from "clsx";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import React from "react";
 
 interface BackgroundCirclesProps {
   title?: string;
-  description?: string;
   className?: string;
   variant?: keyof typeof COLOR_VARIANTS;
 }
@@ -88,85 +88,87 @@ const AnimatedGrid = () => (
 
 export function BackgroundCircles({
   title = "Background Circles",
-  description = "Not Completely Round",
   className,
   variant = "octonary",
 }: BackgroundCirclesProps) {
   const variantStyles = COLOR_VARIANTS[variant];
+  const targetRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start start", "end start"],
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.25]);
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "-38%"]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const gridOpacity = useTransform(scrollYProgress, [0, 0.7], [0.2, 0]);
 
   return (
-    <div
-      className={clsx(
-        "relative flex h-screen w-full items-center justify-center overflow-hidden",
-        "bg-white dark:bg-black/5",
-        className
-      )}
-    >
-      <AnimatedGrid />
-      <motion.div className="absolute h-[480px] w-[480px]">
-        {[0, 1, 2, 3].map((i) => (
-          <motion.div
-            key={i}
-            className={clsx(
-              "absolute inset-0 rounded-full",
-              "border-2 bg-gradient-to-br", // Changed to standard Tailwind class
-              variantStyles.border[i],
-              variantStyles.gradient
-            )}
-            animate={{
-              rotate: 360,
-              scale: [1, 1.05 + i * 0.05, 1],
-              opacity: [0.8, 1, 0.8],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
-            }}
-          >
-            <div
-              className={clsx(
-                "absolute inset-0 rounded-full mix-blend-screen",
-                `bg-[radial-gradient(ellipse_at_center,rgba(var(--tw-color-${variantStyles.radial}),0.1),transparent_70%)]` // Using CSS variable for radial gradient
-              )}
-            />
-          </motion.div>
-        ))}
-      </motion.div>
-
+    <>
+      <div
+        ref={targetRef}
+        className={clsx("relative h-screen w-full", className)}
+      />
       <motion.div
-        className="relative z-10 text-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        style={{ scale, x, y }}
+        className="fixed top-0 left-0 z-0 flex h-screen w-screen items-center justify-center pointer-events-none"
       >
-        <h1
-          className={clsx(
-            "text-5xl font-bold tracking-tight md:text-7xl",
-            "bg-gradient-to-b from-slate-850 to-slate-100 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent",
-            "drop-shadow-[0_0_32px_rgba(94,234,212,0.4)]"
-          )}
-        >
-          {title}
-        </h1>
+        <motion.div style={{ opacity: gridOpacity }}>
+          <AnimatedGrid />
+        </motion.div>
+        <motion.div className="absolute h-[480px] w-[480px]">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              className={clsx(
+                "absolute inset-0 rounded-full",
+                "border-2 bg-gradient-to-br", // Changed to standard Tailwind class
+                variantStyles.border[i],
+                variantStyles.gradient
+              )}
+              animate={{
+                rotate: 360,
+                scale: [1, 1.05 + i * 0.05, 1],
+                opacity: [0.8, 1, 0.8],
+              }}
+              transition={{
+                duration: 5,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "easeInOut",
+              }}
+            >
+              <div
+                className={clsx(
+                  "absolute inset-0 rounded-full mix-blend-screen",
+                  `bg-[radial-gradient(ellipse_at_center,rgba(var(--tw-color-${variantStyles.radial}),0.1),transparent_70%)]` // Using CSS variable for radial gradient
+                )}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
 
-        <motion.p
-          className="mt-6 text-lg md:text-xl dark:text-white text-slate-950"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
+        <motion.div
+          style={{ opacity: textOpacity }}
+          className="relative z-10 text-center"
         >
-          {description}
-          {/* <span className="mx-3 opacity-50"></span>
-          xUI */}
-        </motion.p>
+          <h1
+            className={clsx(
+              "text-5xl font-bold tracking-tight md:text-7xl",
+              "bg-gradient-to-b from-slate-850 to-slate-100 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent",
+              "drop-shadow-[0_0_32px_rgba(94,234,212,0.4)]"
+            )}
+          >
+            {title}
+          </h1>
+        </motion.div>
+
+        <div className="absolute inset-0 [mask-image:radial-gradient(90%_60%_at_50%_50%,#000_40%,transparent)]">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0F766E/30%,transparent_70%)] blur-[120px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#2DD4BF/15%,transparent)] blur-[80px]" />
+        </div>
       </motion.div>
-
-      <div className="absolute inset-0 [mask-image:radial-gradient(90%_60%_at_50%_50%,#000_40%,transparent)]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0F766E/30%,transparent_70%)] blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#2DD4BF/15%,transparent)] blur-[80px]" />
-      </div>
-    </div>
+    </>
   );
 }
 
