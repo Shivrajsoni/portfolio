@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAllProofOfWork, createProofOfWork } from "@/lib/proof-of-work-utils";
+import {
+  getAllProofOfWork,
+  createProofOfWork,
+  getProofOfWorkBySlug,
+} from "@/lib/proof-of-work-utils";
 
 export async function GET() {
   try {
@@ -18,9 +22,18 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     // Basic validation
-    if (!data.title || !data.content || !data.excerpt || !data.tags || !data.type) {
+    if (
+      !data.title ||
+      !data.content ||
+      !data.excerpt ||
+      !data.tags ||
+      !data.type
+    ) {
       return NextResponse.json(
-        { error: "Missing required fields (title, content, excerpt, tags, type)" },
+        {
+          error:
+            "Missing required fields (title, content, excerpt, tags, type)",
+        },
         { status: 400 }
       );
     }
