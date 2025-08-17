@@ -155,7 +155,7 @@ export function BackgroundCircles({
           <h1
             className={clsx(
               "text-5xl font-bold tracking-tight md:text-7xl",
-              "bg-gradient-to-b from-slate-850 to-slate-100 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent",
+              "bg-gradient-to-b from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent",
               "drop-shadow-[0_0_32px_rgba(94,234,212,0.4)]"
             )}
           >

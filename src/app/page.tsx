@@ -10,8 +10,8 @@ export default function Home() {
     <div className="relative min-h-screen flex-col bg-white dark:bg-black">
       <Header />
       <BackgroundCircles title="Time is Reactive " variant="tertiary" />
-      {/* <div className="relative z-10">
-        <div className="h-[150vh]" />
+      <div className="relative z-10">
+        <div className="h-[100vh]" />
         <div className="container mx-auto px-4 py-16">
           <h2 className="text-3xl font-bold text-center">
             This is the content section
@@ -23,8 +23,8 @@ export default function Home() {
             visual experience for the user.
           </p>
         </div>
-        <div className="h-[150vh]" />
-      </div> */}
+        <div className="h-[100vh]" />
+      </div>
       <Footer />
     </div>
   );
