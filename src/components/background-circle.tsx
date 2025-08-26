@@ -1,8 +1,8 @@
 "use client";
-
+import { useTheme } from "next-themes";
 import { motion, useScroll, useTransform } from "framer-motion";
 import clsx from "clsx";
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import React from "react";
 
 interface BackgroundCirclesProps {
@@ -89,8 +89,16 @@ const AnimatedGrid = () => (
 export function BackgroundCircles({
   title = "Background Circles",
   className,
-  variant = "octonary",
+  variant: initialVariant = "octonary",
 }: BackgroundCirclesProps) {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const variant = theme === "light" ? "primary" : initialVariant;
   const variantStyles = COLOR_VARIANTS[variant];
   const targetRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -98,11 +106,15 @@ export function BackgroundCircles({
     offset: ["start start", "end start"],
   });
 
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.25]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.2]);
   const x = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "-38%"]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const gridOpacity = useTransform(scrollYProgress, [0, 0.7], [0.2, 0]);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <>
@@ -112,7 +124,7 @@ export function BackgroundCircles({
       />
       <motion.div
         style={{ scale, x, y }}
-        className="fixed top-0 left-0 z-0 flex h-screen w-screen items-center justify-center pointer-events-none"
+        className="fixed top-0 left-0 z-10 flex h-screen w-screen items-center justify-center pointer-events-none"
       >
         <motion.div style={{ opacity: gridOpacity }}>
           <AnimatedGrid />
@@ -155,7 +167,7 @@ export function BackgroundCircles({
           <h1
             className={clsx(
               "text-5xl font-bold tracking-tight md:text-7xl",
-              "bg-gradient-to-b from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent",
+              "bg-gradient-to-b from-slate-600 to-slate-300 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent",
               "drop-shadow-[0_0_32px_rgba(94,234,212,0.4)]"
             )}
           >

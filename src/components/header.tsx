@@ -66,30 +66,9 @@ const Header = () => {
 
   return (
     <>
-      <div className="sm:hidden w-full p-2.5 bg-white dark:bg-black/5">
-        <Link
-          href="#"
-          target="_blank"
-          className="flex items-center justify-center gap-2"
-        >
-          <span className="flex items-center gap-2">
-            <PartyPopper className="w-3.5 h-3.5" />
-            <span className="text-transparent bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 bg-clip-text font-semibold">
-              Explore new components
-            </span>
-          </span>
-          <div className="group relative inline-flex items-center gap-2 px-3 py-1 text-sm rounded-lg bg-zinc-900 dark:bg-zinc-100 transition-colors">
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 opacity-40 group-hover:opacity-80 blur-sm transition-opacity duration-500" />
-            <div className="relative z-10 flex items-center gap-2">
-              <span className="text-white dark:text-zinc-900">with xUI</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-white/90 dark:text-zinc-900/90" />
-            </div>
-          </div>
-        </Link>
-      </div>
-      <div className="sticky left-0 right-0 top-0 z-50">
+      <div className="sticky left-0 right-0 top-0 z-40">
         <div className="bg-white dark:bg-black/5 w-full">
-          <div className="flex items-center justify-center w-full flex-col">
+          <div className="flex items-center justify-center w-full flex-col ">
             <motion.header
               initial={{ y: -100 }}
               animate={{ y: 0 }}

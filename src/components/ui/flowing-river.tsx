@@ -66,13 +66,17 @@ const DarkModeRiver = () => (
 
 // This component contains the new, more vibrant design for light mode.
 const LightModeRiver = () => (
-  <svg
+    <svg
     className="absolute bottom-0 left-0 w-full h-full"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 1000 200"
     preserveAspectRatio="xMidYMax meet"
   >
     <defs>
+      <linearGradient id="riverGradientLight" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" className="stop-emerald-300/70" />
+        <stop offset="100%" className="stop-cyan-400/70" />
+      </linearGradient>
       <path
         id="wave1-light"
         d="M-1000 120 Q-750 180 -500 120 T 0 120 T 500 120 T 1000 120 T 1500 120 V 200 H -1000 Z"
@@ -81,45 +85,47 @@ const LightModeRiver = () => (
         id="wave2-light"
         d="M-1000 110 Q-750 140 -500 110 T 0 110 T 500 110 T 1000 110 T 1500 110 V 200 H -1000 Z"
       />
-      <path
+       <path
         id="wave3-light"
         d="M-1000 115 Q-750 150 -500 115 T 0 115 T 500 115 T 1000 115 T 1500 115 V 200 H -1000 Z"
       />
       <path
         id="shimmer-light"
-        strokeWidth="2"
+        strokeWidth="1.5"
         strokeLinecap="round"
         d="M-1000 115 Q-750 125 -500 115 T 0 115 T 500 115 T 1000 115 T 1500 115"
       />
     </defs>
     <g className="waves">
-      <motion.use
+        <motion.use
         href="#wave3-light"
-        className="fill-blue-600 opacity-90"
+        fill="url(#riverGradientLight)"
+        className="opacity-80"
         animate={{ x: [0, 1000] }}
         transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
       />
       <motion.use
-        href="#wave2-light"
-        className="fill-blue-500 opacity-90"
+        href="#wave1-light"
+        fill="url(#riverGradientLight)"
         animate={{ x: [0, -1000] }}
         transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
       />
       <motion.use
-        href="#wave1-light"
-        className="fill-cyan-400 opacity-90"
+        href="#wave2-light"
+        fill="url(#riverGradientLight)"
+        className="opacity-60"
         animate={{ x: [0, 1000] }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
       />
       <motion.use
         href="#shimmer-light"
-        className="stroke-orange-200/90"
+        className="stroke-white/80"
         animate={{
           strokeDasharray: ['0, 20, 15, 5, 30, 200', '15, 5, 30, 20, 0, 200'],
-          opacity: [0.9, 0.6, 0.9, 0.4, 1, 0.9, 0.6],
+          opacity: [0.8, 0.5, 0.8, 0.3, 1, 0.8, 0.5],
         }}
         transition={{
-          duration: 4,
+          duration: 5,
           repeat: Infinity,
           repeatType: 'mirror',
           ease: 'easeInOut',
@@ -145,7 +151,7 @@ const FlowingRiver = () => {
 
   return (
     <div className="relative w-full h-48 md:h-64 -mt-16">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-blue-400/20 via-transparent to-transparent dark:from-blue-500/30 blur-xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-emerald-300/30 via-transparent to-transparent dark:from-blue-500/30 blur-xl" />
       {theme === 'dark' ? <DarkModeRiver /> : <LightModeRiver />}
     </div>
   );
