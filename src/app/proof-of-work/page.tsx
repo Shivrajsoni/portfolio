@@ -21,6 +21,7 @@ import {
   Award,
   Megaphone,
 } from "lucide-react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 const ProofOfWorkPage = async () => {
   const allProofOfWork = await getAllProofOfWork();
@@ -28,6 +29,17 @@ const ProofOfWorkPage = async () => {
   return (
     <BeamsBackground intensity="subtle">
       <div className="container mx-auto py-12 px-4 relative z-10">
+        <Breadcrumb className="mb-8">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Proof of Work</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <h1 className="text-5xl font-bold text-center mb-16 text-white tracking-tighter">
           My Proof of Work
         </h1>
@@ -108,7 +120,7 @@ const ProofOfWorkPage = async () => {
                       rel="noopener noreferrer"
                       className="text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1.5"
                     >
-                      <Link className="w-4 h-4" />
+                      <span><Link className="w-4 h-4" /></span>
                       <span>Live Preview</span>
                     </a>
                   )}

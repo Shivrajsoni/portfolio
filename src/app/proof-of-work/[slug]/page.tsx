@@ -1,17 +1,17 @@
 import React from "react";
-import { getProjectBySlug, getAllProjectSlugs } from "@/lib/project-utils";
+import { getProofOfWorkBySlug, getAllProofOfWorkSlugs } from "@/lib/proof-of-work-utils";
 import { notFound } from "next/navigation";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export async function generateStaticParams() {
-  const slugs = getAllProjectSlugs();
+  const slugs = getAllProofOfWorkSlugs();
   return slugs.map((slug) => ({ slug }));
 }
 
-const ProjectPage = async ({ params }: { params: { slug: string } }) => {
-  const project = await getProjectBySlug(params.slug);
+const ProofOfWorkPage = async ({ params }: { params: { slug: string } }) => {
+  const proofOfWork = await getProofOfWorkBySlug(params.slug);
 
-  if (!project) {
+  if (!proofOfWork) {
     notFound();
   }
 
@@ -24,37 +24,37 @@ const ProjectPage = async ({ params }: { params: { slug: string } }) => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/projects">Projects</BreadcrumbLink>
+            <BreadcrumbLink href="/proof-of-work">Proof of Work</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{project.title}</BreadcrumbPage>
+            <BreadcrumbPage>{proofOfWork.title}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <article className="prose dark:prose-invert max-w-none">
-        <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
+        <h1 className="text-4xl font-bold mb-4">{proofOfWork.title}</h1>
         <div className="flex items-center text-sm text-muted-foreground mb-8">
-          <span>{project.date}</span>
+          <span>{proofOfWork.date}</span>
           <span className="mx-2">•</span>
-          <span>{project.readTime}</span>
+          <span>{proofOfWork.readTime}</span>
         </div>
-        {project.liveLink && (
+        {proofOfWork.liveLink && (
           <div className="mb-8">
             <a
-              href={project.liveLink}
+              href={proofOfWork.liveLink}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
             >
-              View Live Project
+              View Live
             </a>
           </div>
         )}
-        <div dangerouslySetInnerHTML={{ __html: project.content }} />
+        <div dangerouslySetInnerHTML={{ __html: proofOfWork.content }} />
       </article>
     </div>
   );
 };
 
-export default ProjectPage;
+export default ProofOfWorkPage;

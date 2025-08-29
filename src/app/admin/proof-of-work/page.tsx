@@ -182,24 +182,20 @@ const ProofOfWorkManagement = () => {
       }
 
       alert(
-        `Proof of work entry "${formData.title}" ${
-          editingProofOfWork ? "updated" : "created"
+        `Proof of work entry "${formData.title}" ${editingProofOfWork ? "updated" : "created"
         } successfully!`
       );
       resetForm();
       loadProofOfWork();
     } catch (error: unknown) {
       console.error(
-        `Error ${
-          editingProofOfWork ? "updating" : "creating"
+        `Error ${editingProofOfWork ? "updating" : "creating"
         } proof of work entry:`,
         error
       );
       alert(
-        `Failed to ${
-          editingProofOfWork ? "update" : "create"
-        } proof of work entry: ${
-          error instanceof Error ? error.message : "An unknown error occurred"
+        `Failed to ${editingProofOfWork ? "update" : "create"
+        } proof of work entry: ${error instanceof Error ? error.message : "An unknown error occurred"
         }`
       );
     } finally {
@@ -347,8 +343,8 @@ const ProofOfWorkManagement = () => {
                   {isSubmitting
                     ? "Saving..."
                     : editingProofOfWork
-                    ? "Update Entry"
-                    : "Create Entry"}
+                      ? "Update Entry"
+                      : "Create Entry"}
                 </Button>
                 <Button
                   type="button"

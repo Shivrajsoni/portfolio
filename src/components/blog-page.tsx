@@ -2,6 +2,8 @@
 import React from "react";
 import type { BlogPost } from "@/lib/blog-utils";
 import Link from "next/link";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Badge } from "@/components/ui/badge";
 
 interface BlogPageProps {
   blog: BlogPost;
@@ -11,13 +13,21 @@ const BlogPage = ({ blog }: BlogPageProps) => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* Back Button */}
-        <Link
-          href="/blog"
-          className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mb-8"
-        >
-          ← Back to Blogs
-        </Link>
+        <Breadcrumb className="mb-8">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/blog">Blogs</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{blog.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
         {/* Blog Header */}
         <header className="mb-12">
@@ -44,12 +54,9 @@ const BlogPage = ({ blog }: BlogPageProps) => {
           {blog.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {blog.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 text-sm bg-muted text-muted-foreground rounded-full"
-                >
+                <Badge key={tag} variant="secondary">
                   {tag}
-                </span>
+                </Badge>
               ))}
             </div>
           )}
@@ -69,12 +76,7 @@ const BlogPage = ({ blog }: BlogPageProps) => {
             <div className="text-sm text-muted-foreground">
               © 2025 Shivraj Soni. All rights reserved.
             </div>
-            <Link
-              href="/blog"
-              className="text-sm text-primary hover:opacity-80 transition-colors"
-            >
-              ← Back to Blogs
-            </Link>
+            
           </div>
         </footer>
       </div>
