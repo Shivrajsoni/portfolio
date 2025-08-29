@@ -57,7 +57,7 @@ const Blogs = ({ initialBlogs }: BlogsProps) => {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Blogs</h1>
+          <h1 className="text-5xl font-bold  mb-16 text-foreground tracking-tighter">Blogs</h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-8">

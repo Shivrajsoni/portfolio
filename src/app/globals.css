@@ -71,6 +71,11 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+html,
+body {
+  height: 100%;
+}
+
 @layer base {
   * {
     @apply border-border;

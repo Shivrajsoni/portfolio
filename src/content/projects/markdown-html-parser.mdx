@@ -1,11 +1,138 @@
 ---
-title: "markdown-html parser"
-excerpt: "A rust Library"
-date: "2025-08-26"
-tags: ["Rust"]
+title: "Markdown-html parser"
+excerpt: "A rust library that lets you parse markdown to html files ..."
+date: "2025-08-29"
+tags: ["Rust", "Crate"]
 author: "Shivraj Soni"
 featured: false
 liveLink: "https://github.com/Shivrajsoni/markdown-html-parser"
 ---
 
-a;mfdadsfas
+
+# Markdown to HTML Parser in Rust
+
+A simple, lightweight library for converting Markdown to HTML, written in pure, safe Rust. This project aims to provide a straightforward and easy-to-use package for your Rust applications.
+
+> **Crate:** `mark-html` · **Version:** `0.2.0`
+
+---
+
+---
+## ✨ Features
+Currently, the following Markdown syntax is supported:
+
+- **Headings** (`#`, `##`, `###`, ...)
+- **Bold** (`**text**`)
+- **Italic** (`*text*`)
+- **Links** (`[display text](url)`)
+- **Unordered Lists** (`- list item`)
+- **Code**
+  - Inline code using backticks: `` `code` ``
+  - Fenced code blocks using triple backticks:
+
+    ```
+    ```language
+    // code here
+    ```
+    ```
+
+> **Note:** Parsing is designed to be deterministic and allocation-conscious. The parser intentionally avoids unsafe code.
+
+---
+
+## 📦 Installation
+Add `mark-html` to your `Cargo.toml`:
+
+```toml
+[dependencies]
+mark-html = "0.2.0"
+```
+
+Or use `cargo add`:
+
+```bash
+cargo add mark-html
+```
+
+---
+
+## 🚀 Usage
+Use the `to_html` function to convert Markdown to HTML.
+
+```rust
+// main.rs
+extern crate mark_html;
+
+fn main() {
+    let markdown = "## Hello, World!\n\nThis is a **test** of our *new* parser.\n\n- Item 1\n- Item 2";
+    let html = mark_html::to_html(markdown);
+    println!("{}", html);
+}
+```
+
+### API
+```rust
+pub fn to_html(input: &str) -> String
+```
+- **input**: Markdown source text
+- **returns**: HTML string
+
+---
+
+## 🏛️ Architecture
+The conversion pipeline has three stages:
+
+1. **Lexing** – Scans the input and produces a stream of tokens. For example, `**hello**` → `[BoldStart, Text("hello"), BoldEnd]`.
+2. **Parsing** – Consumes tokens to build an **AST (Abstract Syntax Tree)** representing the document structure (e.g., a paragraph containing bold/italic nodes).
+3. **Rendering** – Traverses the AST to emit valid, minimal HTML for each node.
+
+> Keeping these stages separate makes it easier to add features (like blockquotes or ordered lists) without breaking existing behavior.
+
+---
+
+## 🆕 What’s New in `0.2.0`
+- Added support for **fenced code blocks**.
+- Improved handling of nested inline formatting (bold + italic).
+- Minor performance improvements in the lexer.
+
+---
+
+## 🧪 Examples
+
+### Input (Markdown)
+```markdown
+# Main Title
+
+This is a paragraph with **bold** and *italic* text. Here is a [link to GitHub](https://github.com/Shivrajsoni).
+
+- First list item
+- Second list item
+```
+
+### Output (HTML)
+```html
+<h1>Main Title</h1>
+<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text. Here is a <a href="https://github.com/Shivrajsoni">link to GitHub</a>.</p>
+<ul>
+  <li>First list item</li>
+  <li>Second list item</li>
+</ul>
+```
+
+---
+
+## 🧭 Roadmap
+- [x] Ordered lists 
+- [x] Blockquotes (`quote`)
+- [x] Code block language class names (e.g., `<pre><code class="language-rust">`)
+- [ ] Tables
+- [ ] Images
+
+---
+
+## ⚠️ Limitations
+- Focuses on a useful subset of Markdown; not a full CommonMark implementation yet.
+- HTML sanitization is **out of scope**; if you render untrusted input, sanitize the output in your application.
+
+---
+

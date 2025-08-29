@@ -98,7 +98,7 @@ export function BackgroundCircles({
     setMounted(true);
   }, []);
 
-  const variant = theme === "light" ? "primary" : initialVariant;
+  const variant = theme === "light" ? "quaternary" : initialVariant;
   const variantStyles = COLOR_VARIANTS[variant];
   const targetRef = useRef(null);
   const { scrollYProgress } = useScroll({

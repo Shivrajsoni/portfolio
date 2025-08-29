@@ -4,6 +4,7 @@ import { ProjectMeta } from "@/lib/project-utils";
 import { ProjectsGrid } from "@/components/projects-grid";
 import { Button } from "@/components/ui/button";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import BeamsBackground from "@/components/beams-background";
 
 const ProjectsPage = () => {
   const [allProjects, setAllProjects] = useState<ProjectMeta[]>([]);
@@ -54,41 +55,44 @@ const ProjectsPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Breadcrumb className="mb-8">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Projects</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] text-zinc-900 dark:text-zinc-100">Projects</h1>
+    <BeamsBackground intensity="subtle">
+      <div className="container mx-auto py-12 px-4 relative z-10">
+        <Breadcrumb className="mb-8">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Projects</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <h1 className="text-5xl font-bold text-center mb-16 text-white tracking-tighter">
+          Projects
+        </h1>
 
-      <div className="flex flex-wrap items-center gap-2 mb-8">
-        <span className="text-muted-foreground mr-2">Filter by:</span>
-        {tags.map((tag) => (
-          <Button
-            key={tag}
-            variant={selectedTag === tag ? "default" : "ghost"}
-            size="sm"
-            onClick={() => filterProjects(tag)}
-            className="rounded-full"
-          >
-            {tag}
-          </Button>
-        ))}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+          {tags.map((tag) => (
+            <Button
+              key={tag}
+              variant={selectedTag === tag ? "default" : "ghost"}
+              size="sm"
+              onClick={() => filterProjects(tag)}
+              className="rounded-full bg-white/10 text-white/80 border-none hover:bg-white/20"
+            >
+              {tag}
+            </Button>
+          ))}
+        </div>
+
+        {isLoading ? (
+          <p className="text-center text-white/70">Loading projects...</p>
+        ) : (
+          <ProjectsGrid projects={filteredProjects} />
+        )}
       </div>
-
-      {isLoading ? (
-        <p>Loading projects...</p>
-      ) : (
-        <ProjectsGrid projects={filteredProjects} />
-      )}
-    </div>
+    </BeamsBackground>
   );
 };
 

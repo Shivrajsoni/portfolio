@@ -35,15 +35,17 @@ export interface ProjectPost {
 }
 
 export interface ProjectMeta {
-  slug: string;
   title: string;
+  slug: string;
+  description: string;
+  excerpt: string; // Added excerpt
   date: string;
-  excerpt: string;
-  readTime: string;
+  timeline?: string; // Added timeline
+  isFeatured: boolean;
   tags: string[];
-  author?: string;
-  featured?: boolean;
+  githubLink?: string;
   liveLink?: string;
+  pagePreviewLink?: string; // Added pagePreviewLink
 }
 
 // Calculate reading time based on content length
