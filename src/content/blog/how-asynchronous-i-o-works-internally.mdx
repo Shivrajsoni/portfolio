@@ -1,0 +1,139 @@
+---
+title: "How Asynchronous I/O Works Internally in Rust  ?"
+date: "2025-08-29"
+excerpt: "You know it's about non-blocking, but the real magic is in the cooperation between the programming language, the runtime, and the operating system..."
+tags: ["OS", "Rust"]
+author: "Shivraj Soni"
+featured: false
+---
+
+# Async in Rust: Reactor, Future, and Executor
+
+Rust’s `async` is not some black-box magic.  
+It’s a **3-layer system** that uses the operating system, language features, and a runtime to let you handle thousands of tasks without burning thousands of threads.  
+
+We’ll break it down step by step.
+
+---
+
+## 1. Reactor Pattern (OS Level)
+
+At the bottom, the **operating system** provides an efficient way to monitor many I/O events at once.
+
+Instead of looping and asking:
+> "Hey socket, got data yet? No? How about now? Now??"
+
+We ask the OS:
+> "Here’s a list of sockets. Please wake me up when any of them is ready."
+
+This is called the **Reactor Pattern**.
+
+- **Linux:** `epoll`  
+- **macOS/BSD:** `kqueue`  
+- **Windows:** IOCP (slightly different, Proactor style)  
+- **Old times:** `select` / `poll`  
+
+### Example flow (with epoll):
+1. Register file descriptors/sockets with `epoll`.  
+2. Call `epoll_wait()` → runtime goes to sleep.  
+3. OS wakes it up when an event happens.  
+4. Runtime dispatches the right handler for that event.  
+
+👉 That’s how a single thread can handle **10,000 connections** without collapsing.
+
+---
+
+## 2. Futures (Language Level)
+
+When you write this in Rust:
+
+```rust
+async fn fetch_data() -> String {
+    "Hello".to_string()
+}
+```
+
+## The Executor: Driving Futures to Completion 
+
+So far, we’ve seen how the **Reactor** (OS-level event notification) and **Futures** (Rust state machines) fit into async programming.  
+But there’s still one missing piece:  
+
+👉 **Who keeps polling the futures until they’re done?**  
+
+That’s the **Executor**.  
+Think of it as the **event loop** of your async program.
+
+---
+
+## How the Executor Works
+
+Here’s the step-by-step cycle:
+
+1. **Keep a queue of tasks (futures).**  
+   These are all the computations waiting to run.
+
+2. **Pick one task → call `poll()`.**  
+   This checks if the future can make progress.
+
+3. **If it’s `Ready` → it’s done.**  
+   The result is available, and the task can be removed.
+
+4. **If it’s `Pending` → park it until its Waker fires.**  
+   The future isn’t ready yet (maybe waiting on I/O).  
+   It hands the executor a **Waker**, saying:  
+   > "When my socket/data is ready, call me again."
+
+5. **If nothing is ready → nap.**  
+   The executor calls the OS (`epoll_wait()` on Linux, `kqueue` on macOS, `IOCP` on Windows) and sleeps.  
+   No CPU is wasted.
+
+6. **When the OS signals readiness → wake the right task.**  
+   That task is put back into the runnable queue.
+
+7. **Repeat forever.**  
+   This loop is efficient, non-blocking, and lets thousands of tasks share just a few threads.
+
+---
+
+## Simple Analogy
+
+Imagine a teacher (Executor) with a class full of students (Futures).  
+
+- The teacher goes desk to desk asking:  
+  > "Are you done with your homework?"  
+- If a student says **"Yes" (Ready)** → check the homework and move on.  
+- If a student says **"Not yet" (Pending)** → the student raises their hand (Waker) when they’re ready.  
+- If nobody is ready, the teacher takes a nap until someone calls them.
+
+That’s basically async Rust.
+
+---
+
+### In Summary
+
+The **Executor** is the engine that drives async Rust:
+
+- It runs a queue of tasks.
+- It polls futures until they’re done.
+- It cooperates with the OS Reactor (`epoll`, `kqueue`, `IOCP`) to avoid wasting CPU.
+- It uses **Wakers** to know when a task should be retried.
+
+⚡ Without the Executor, futures would never make progress.  
+
+---
+
+```rust
+// Pseudo-code of an Executor loop
+loop {
+    if let Some(task) = runnable_queue.pop() {
+        match task.poll() {
+            Ready(val) => println!("Task finished: {:?}", val),
+            Pending => park_task(task), // waits for Waker
+        }
+    } else {
+        // No tasks ready → wait for OS to signal
+        os_reactor_wait();
+    }
+}
+``` 
+Thnx for read

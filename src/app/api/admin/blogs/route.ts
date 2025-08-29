@@ -107,77 +107,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT - Update an existing blog post
-export async function PUT(request: NextRequest) {
-  try {
-    const ip =
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      "unknown";
-    if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
-        { status: 429 }
-      );
-    }
 
-    const token = request.cookies.get("adminToken")?.value || null;
-    if (!isAdminAuthenticated(token)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { slug, title, excerpt, content, tags, author, featured } =
-      await request.json();
-
-    if (!slug || !title || !excerpt || !content) {
-      return NextResponse.json(
-        { error: "Slug, title, excerpt, and content are required" },
-        { status: 400 }
-      );
-    }
-
-    if (!blogPostExists(slug)) {
-      return NextResponse.json(
-        { error: `Blog post with slug "${slug}" not found` },
-        { status: 404 }
-      );
-    }
-
-    const mdxContent = `---
-title: "${title.replace(/"/g, '"')}"
-date: "${new Date().toISOString().split("T")[0]}"
-excerpt: "${excerpt.replace(/"/g, '"')}"
-tags: [${(tags || "")
-      .split(",")
-      .map((tag: string) => `"${tag.trim()}"`) // Corrected: Ensure tags are properly quoted within the array
-      .join(", ")}]
-author: "${(author || "Shivraj Soni").replace(/"/g, '"')}"
-featured: ${featured || false}
----
-
-${content}`;
-
-    const success = updateBlogPost(slug, mdxContent);
-
-    if (!success) {
-      return NextResponse.json(
-        { error: "Failed to update blog post" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Blog post updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating blog post:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
 
 // DELETE - Delete a blog post
 export async function DELETE(request: NextRequest) {

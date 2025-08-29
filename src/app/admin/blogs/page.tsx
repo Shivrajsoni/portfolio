@@ -119,7 +119,7 @@ const BlogManagement = () => {
           alert("Blog post deleted successfully!");
           loadBlogs();
         } else {
-          const result = await response.json();
+          const result = response.body ? await response.json() : { error: "An unknown error occurred." };
           throw new Error(result.error || "Unknown error");
         }
       } catch (error) {
@@ -153,8 +153,7 @@ const BlogManagement = () => {
       }
 
       alert(
-        `Blog post "${formData.title}" ${
-          editingBlog ? "updated" : "created"
+        `Blog post "${formData.title}" ${editingBlog ? "updated" : "created"
         } successfully!`
       );
       resetForm();
@@ -257,8 +256,8 @@ const BlogManagement = () => {
                   {isSubmitting
                     ? "Saving..."
                     : editingBlog
-                    ? "Update Blog Post"
-                    : "Create Blog Post"}
+                      ? "Update Blog Post"
+                      : "Create Blog Post"}
                 </Button>
                 <Button
                   type="button"
