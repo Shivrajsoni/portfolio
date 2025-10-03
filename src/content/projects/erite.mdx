@@ -1,38 +1,106 @@
 ---
 title: "Erite"
 excerpt: "Pay to the known one's using solana.."
-date: "2025-08-07"
+date: "2025-10-03"
 tags: ["Solana", "Full Stack"]
 author: "Shivraj Soni"
 featured: false
 liveLink: "https://paysol-two.vercel.app/"
 ---
 
+# ✨ Erite: Simplifying Crypto Payments on Solana ✨
 
----
-title: PaySol Two
----
+Welcome to Erite, a project designed to make Solana-based payments as easy as sending a text message. We abstract away the complexity of long, cumbersome public keys, allowing you to transact with friends and contacts using simple, memorable names.
 
-import React from 'react';
-
-# 👋 Sup, Internet! Welcome to **PaySol Two**
-
-Ever tried sending SOL and USDC, but felt like you were decoding hieroglyphs in a cave with no Wi-Fi?  
-Yeah, we’ve been there. That’s why we built `PaySol Two` — your new favorite sidekick for **lightning-fast**, **idiot-proof**, and **smooth-as-butter** crypto payments.
+> Erite is built on the idea that blockchain payments should be intuitive. Our goal is to create a user experience that feels familiar to users of modern payment apps like Venmo or Cash App, but with the power and decentralization of the Solana blockchain.
 
 ---
 
-## 💼 What’s the sitch?
+## 🚀 Core Features
 
-So here’s the tea 🍵:
+Erite is packed with features designed to streamline your payment workflow:
 
-You pull out your phone, blink twice, and boom —
-- 🔗 Create sleek payment links for Solana-based tokens (yes, **SOL**, **USDC**, and soon... probably your soul).
-- ⚡ Send payments *faster* than your last relationship ended.
-- 📈 Track transactions cleaner than your gym gains graph (if you had one).
-
-All that, wrapped in a UI that doesn’t look like it came from a 2004 hacker movie.
+*   **👤 Contact Management:** Securely save contacts with their associated Solana public keys. Say goodbye to copy-pasting long addresses for every transaction.
+*   **💸 Pay by Name:** Transact with anyone in your contact list by simply using their name. Erite  handles the complex task of routing the payment to the correct public key.
+*   **📬 Payment Requests:** Need to get paid? Send a payment request to another user with a description. You can track the status of all your incoming and outgoing requests.
+*   **⚡ Priority Fee System:** For urgent transactions, you can opt to pay a small priority fee. This ensures your transaction is processed quickly, regardless of network congestion.
+*   **📜 Transaction History:** Keep a clear record of your recent activity. Erite  provides a detailed history of your transactions for easy tracking and management.
+*   **📱 QR Code Payments:** Initiate payments quickly by scanning a user's unique QR code, which pre-fills their address, so all you need to do is enter the amount.
 
 ---
 
-## 🤔 Why PaySol Two Exists
+##  Example 
+
+Imagine you're out for lunch with a friend, and you need to split the bill.
+
+1.  **Adding a Contact:** You've previously added your friend, Alex, to your Paysol contacts by saving his username and public key.
+2.  **Making a Payment:** To pay him back, you open Paysol, select "Alex" from your contact list, enter the amount, and hit "Send".
+3.  **Instant Confirmation:** Erite instantly processes the transaction on the Solana network. You get a confirmation toast, and Alex receives the funds in his wallet.
+
+No more fumbling with long addresses or worrying about sending funds to the wrong place. It's that simple!
+
+---
+
+## 🛠️ Tech Stack
+
+Erite leverages a modern, robust, and scalable tech stack:
+
+*   **Framework:** [Next.js](https://nextjs.org/)
+*   **Language:** [TypeScript](https://www.typescriptlang.org/)
+*   **Blockchain:** [Solana](https://solana.com/)
+*   **Database/ORM:** [Prisma](https://www.prisma.io/) with a PostgreSQL database.
+*   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+*   **UI Components:** [shadcn/ui](https://ui.shadcn.com/)
+*   **Animations:** [Framer Motion](https://www.framer.com/motion/)
+*   **Deployment:** [Vercel](https://vercel.com/)
+
+---
+
+## 🔮 Future Roadmap
+
+We have big plans for Erite. Here's what we're working on next:
+
+*   **👨‍👩‍👧‍👦 Group Payments:** A seamless way to pay multiple people in a single transaction. Perfect for splitting bills with a group of friends.
+*   **🏦 Shared Group Vaults:** Create shared accounts for projects, teams, or communities. These vaults will require multiple signatures (multi-sig) to authorize transactions, adding a layer of security and collaboration.
+*   **🎨 UI/UX Enhancements:** We are continuously working on making the interface more intuitive, animated, and fully responsive for a premium user experience on all devices.
+*   **⚡ API & Performance Optimization:** Refactoring our backend to reduce API calls and improve overall application speed and efficiency, making it ready for production scale.
+
+---
+
+## 🏁 Getting Started
+
+Want to run Erite locally or contribute to the project? Follow these steps:
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/your-username/paysol.git
+    cd paysol
+    ```
+
+2.  **Install Dependencies**
+    We use `bun` for package management.
+    ```bash
+    bun install
+    ```
+
+3.  **Set Up Environment Variables**
+    Create a `.env` file in the root of the project and populate it with the necessary keys (e.g., database URL, Clerk credentials).
+    ```bash
+    cp .env.example .env
+    ```
+
+4.  **Push Database Schema**
+    Apply the database schema using Prisma.
+    ```bash
+    bunx prisma db push
+    ```
+
+5.  **Run the Development Server**
+    ```bash
+    bun dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+
+---
+
+We hope you enjoy using Erite. We're excited to build the future of user-friendly crypto payments!

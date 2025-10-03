@@ -1,11 +1,93 @@
 ---
 title: "term_colr"
 excerpt: "coloured terminal output with help of ascii"
-date: "2025-08-26"
+date: "2025-10-03"
 tags: ["Rust"]
 author: "Shivraj Soni"
 featured: false
 liveLink: "https://github.com/Shivrajsoni/term_colr"
 ---
 
-asdldsadas
+
+# `term_colr`
+
+A simple and lightweight Rust library for adding colors and styles to your terminal output.
+
+## What it is
+
+`term_colr` is a Rust crate that allows you to easily color and style text in your command-line applications. It's designed to be intuitive and easy to use, with a focus on providing a simple and expressive API through macros.
+
+## How it works
+
+The library uses ANSI escape codes to apply colors and styles to the text. It provides a set of macros that wrap the text with the appropriate escape codes, making it easy to add colors without having to deal with the raw escape sequences.
+
+The library also manages a color context, allowing for nested colors and styles. When a new color or style is applied, it is pushed onto a stack. When the colored text is rendered, the color is popped off the stack, and the previous color is restored.
+
+## Functionalities
+
+*   **Basic Colors:** A set of macros for common foreground and background colors.
+    *   Foreground: `red!`, `green!`, `blue!`, `yellow!`, `black!`, `white!`
+    *   Background: `bg_red!`, `bg_green!`, `bg_blue!`, `bg_yellow!`, `bg_gray!`
+*   **Text Styles:** Macros for basic text styling.
+    *   `bold!`
+    *   `underline!`
+    *   `italic!`
+*   **Advanced Colors:** Support for more advanced color models.
+    *   `rgb!(r, g, b, "text")`
+    *   `hsl!(h, s, l, "text")`
+    *   `hsv!(h, s, v, "text")`
+*   **Advanced Background Colors:** Support for advanced color models for backgrounds.
+    *   `bg_rgb!(r, g, b, "text")`
+    *   `bg_hsl!(h, s, l, "text")`
+    *   `bg_hsv!(h, s, v, "text")`
+*   **Nested Colors:** The library supports nested colors and styles, allowing you to combine different colors and styles in the same line of text.
+
+## Example Usage
+
+Here are a few examples of how to use `term_colr`:
+
+### Basic Colors
+
+```rust
+use term_colr::{red, green, blue};
+
+println!("This is a {} text.", red!("red"));
+println!("This is a {} text.", green!("green"));
+println!("This is a {} text.", blue!("blue"));
+```
+
+### Styling
+
+```rust
+use term_colr::{bold, underline, italic};
+
+println!("This is a {} text.", bold!("bold"));
+println!("This is an {} text.", underline!("underlined"));
+println!("This is an {} text.", italic!("italic"));
+```
+
+### Nested Colors
+
+```rust
+use term_colr::{white, red, green};
+
+println!("{}", white!("This is {} with {} color", red!("red"), green!("green")));
+```
+
+### RGB, HSL, and HSV Colors
+
+```rust
+use term_colr::{rgb, hsl, hsv};
+
+println!("{}", rgb!(255, 0, 0, "This is bright red text"));
+println!("{}", hsl!(120.0, 1.0, 0.5, "This is green text"));
+println!("{}", hsv!(240.0, 1.0, 1.0, "This is blue text"));
+```
+
+## What's Next
+
+*   **ASCII Art Generation:** I'm planning to add a feature for generating ASCII art from text, which will be a fun addition to the library.
+
+## Technology
+
+`term_colr` is built entirely in **Rust** and is designed to be a lightweight and efficient solution for terminal coloring.

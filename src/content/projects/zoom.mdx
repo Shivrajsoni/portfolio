@@ -1,12 +1,81 @@
 ---
 title: "Xoom"
-excerpt: "Xoom is a full-stack Zoom alternative with modern dev flavor—Next.js frontend, Clerk auth, Stream-powered video. No weird plugin installs. No lag. Just calls so smooth, you'll forget you're still in a meeting."
-date: "2025-08-07"
+excerpt: "Xoom is a full-stack Zoom alternative .."
+date: "2025-10-03"
 tags: ["Full Stack", "Stream", "WebRTC"]
 author: "Shivraj Soni"
 featured: false
 liveLink: " https://xoom-shiv.vercel.app/"
 ---
 
-description: |
-  Xoom is like Zoom if it got therapy, stopped gaslighting your Wi-Fi, and joined a startup with better devs. Built using Next.js (because React is life), Clerk (to make auth painless), and Stream (to make video magic), Xoom gives you crispy, real-time video calls with that “is-this-4K-or-just-vibes” feeling. Whether it's daily standups, roast sessions, or pretending to work while your camera is off, Xoom is built to handle the chaos. No downloads, no nonsense—just pure, pixel-perfect presence.
+# Xoom - Video Conferencing App
+
+This is a real-time video conferencing application built with modern web technologies. It aims to provide a seamless and feature-rich experience for virtual meetings.
+
+## Description
+
+Xoom is a full-stack web application that allows users to create, schedule, and join video meetings. It includes features for managing meetings, viewing recordings, and maintaining a personal meeting room. The application is built with a focus on performance, scalability, and user experience.
+
+## Functionalities
+
+*   **User Authentication:** Secure sign-up and sign-in functionality using Clerk.
+*   **Create Meetings:** Instantly create new meetings.
+*   **Schedule Meetings:** Schedule meetings for a future date and time.
+*   **Join Meetings:** Join existing meetings with a meeting ID.
+*   **Personal Meeting Room:** A dedicated room for each user.
+*   **Upcoming Meetings:** View a list of all your upcoming meetings.
+*   **Previous Meetings:** View a list of all your past meetings.
+*   **Meeting Recordings:** View and manage recordings of your meetings.
+*   **In-Meeting Controls:** Basic controls like ending a call.
+*   **Responsive Design:** The application is designed to work on various screen sizes.
+
+## Example Code Run
+
+To run the project locally, follow these steps:
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/xoom.git
+    cd xoom
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    bun install
+    ```
+
+3.  **Set up environment variables:**
+    Create a `.env.local` file in the root of the project and add the following environment variables:
+
+    ```
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+    CLERK_SECRET_KEY=your_clerk_secret_key
+
+    NEXT_PUBLIC_STREAM_API_KEY=your_stream_api_key
+    STREAM_SECRET_KEY=your_stream_secret_key
+    ```
+
+4.  **Run the development server:**
+    ```bash
+    bun dev
+    ```
+
+    The application will be available at `http://localhost:3000`.
+
+## Tech Stack
+
+*   **Framework:** [Next.js](https://nextjs.org/)
+*   **Language:** [TypeScript](https://www.typescriptlang.org/)
+*   **Authentication:** [Clerk](https://clerk.com/)
+*   **Video Streaming:** [Stream.io](https://getstream.io/)
+*   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+*   **UI Components:** [Shadcn/ui](https://ui.shadcn.com/)
+*   **Package Manager:** [Bun](https://bun.sh/)
+
+## Futures
+
+*   **Chat:** Real-time chat functionality within meetings.
+*   **Screen Sharing:** Ability to share your screen with other participants.
+*   **Meeting Layouts:** Different layouts for video participants (e.g., grid, speaker view).
+*   **Reactions and Polls:** Interactive features like reactions and polls.
+*   **Virtual Backgrounds:** Ability to change your background during a meeting.

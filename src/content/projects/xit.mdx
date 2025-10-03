@@ -1,11 +1,146 @@
 ---
 title: "xit"
 excerpt: "do xit not git "
-date: "2025-08-26"
+date: "2025-10-03"
 tags: ["Rust", "Git"]
 author: "Shivraj Soni"
 featured: false
 liveLink: "https://github.com/Shivrajsoni/xit"
 ---
 
-Version control system
+
+# Xit - A Git-like Version Control System in Rust
+
+Xit is a command-line tool that emulates the basic functionalities of Git. Written entirely in Rust, this project serves as a practical learning exercise to delve into the inner workings of distributed version control systems. It's a great resource for anyone interested in systems programming, Rust, or the fundamentals of Git.
+
+## Project Overview
+
+The primary goal of Xit is to replicate a subset of Git's features to understand how version control systems operate from the ground up. This includes everything from initializing a repository and managing user configurations to handling file staging, committing changes, and respecting ignore rules.
+
+## Tech Stack
+
+- **Language**: [Rust](https://www.rust-lang.org/) (2024 Edition)
+- **Key Crates**:
+    - `flate2`: For data compression and decompression.
+    - `sha-1`: For generating SHA-1 hashes, a core component of Git's object model.
+    - `term_colr`: To provide colored and user-friendly command-line output.
+    - `hex`: For encoding and decoding hexadecimal strings.
+    - `walkdir`: To efficiently traverse directory trees.
+
+## Features
+
+- **Repository Initialization**: Create a new `.xit` repository, mirroring Git's `.git` directory structure.
+- **User Configuration**: Set up a global user name and email, essential for commit attribution.
+- **File Staging**: Add files to an index (staging area) to prepare them for a commit.
+- **Committing**: Create commits with a message to save the state of the repository.
+- **Ignoring Files**: Use a `.xitignore` file to exclude specified files and directories from being tracked.
+- **Repository Status**: View the status of your repository, including staged changes, unstaged modifications, and untracked files.
+- **Colored Output**: Enjoy a more intuitive user experience with colored output for status and other messages.
+
+## File Structure
+
+The project's source code is organized as follows:
+
+```
+src/
+├── lib.rs           # Main library file, contains the core logic
+├── main.rs          # Binary entry point
+├── objects/         # Handles Git objects (blob, commit, tree)
+│   ├── blob.rs
+│   ├── commit.rs
+│   ├── mod.rs
+│   ├── read.rs
+│   ├── tree.rs
+│   └── update.rs
+└── repository/      # Implements repository-level operations
+    ├── add.rs
+    ├── commit.rs
+    ├── config.rs
+    ├── index.rs
+    ├── mod.rs
+    ├── refs.rs
+    ├── repo.rs
+    ├── revert.rs
+    ├── status.rs
+    └── utils.rs
+```
+
+## Commands and Usage
+
+### `xit init`
+
+Initializes a new repository in the current directory. This creates a `.xit` directory with the necessary subdirectories and files.
+
+```sh
+$ xit init
+Initialized empty Xit repository in /path/to/your/project/.xit/
+```
+
+### `xit setup`
+
+Interactively prompts you to set up your global user name and email. This information is stored in `~/.xit/config` and is used for all your commits.
+
+```sh
+$ xit setup
+Enter your name: Your Name
+Enter your email: your.email@example.com
+Global user name and email have been set.
+```
+
+### `xit add <file>`
+
+Adds a file to the staging area (the index). The file's content is stored as a blob object.
+
+```sh
+$ xit add README.md
+```
+
+### `xit commit -m "<message>"`
+
+Creates a new commit with the staged files. This involves creating a commit object and a tree object to represent the state of the repository.
+
+```sh
+$ xit commit -m "Add initial README"
+[master (root-commit) 1a2b3c4] Add initial README
+ 1 file changed
+```
+
+### `xit status`
+
+Shows the status of the working tree with color-coded output. It lists changes staged for commit (green), changes not staged for commit (red), and untracked files (red).
+
+```sh
+$ xit status
+On branch master
+Changes to be committed:
+  (use "xit reset HEAD <file>..." to unstage)
+
+        new file:   README.md
+
+Untracked files:
+  (use "xit add <file>..." to include in what will be committed)
+
+        src/
+```
+
+## Ignoring Files (.xitignore)
+
+You can create a `.xitignore` file in the root of your repository to tell Xit to ignore certain files and directories. This works similarly to Git's `.gitignore`. By default, Xit ignores `.xit`, `.git`, and `target`.
+
+## Future Scope
+
+Xit is an evolving project. Here are some features that could be added in the future:
+
+- **Branching and Merging**: Implement `branch` and `merge` commands.
+- **Viewing Commit History**: Add a `log` command to display the commit history.
+- **Diffing**: Introduce a `diff` command to show differences between commits, branches, or files.
+- **Networking**: Add support for remote repositories (`push`, `pull`, `clone`).
+- **Reverting and Resetting**: Enhance the `revert` functionality and add a `reset` command.
+
+## Contributing
+
+Contributions are welcome! If you'd like to help improve Xit, please feel free to fork the repository, make your changes, and submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

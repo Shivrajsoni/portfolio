@@ -1,11 +1,136 @@
 ---
 title: "xedis"
 excerpt: "Rust Implementation of redis"
-date: "2025-08-26"
+date: "2025-10-03"
 tags: ["Rust"]
 author: "Shivraj Soni"
 featured: false
 liveLink: "https://github.com/Shivrajsoni/xedis"
 ---
 
-dsadsada
+# Xedis: A Simple, Persistent, Crash-Safe Key-Value Database
+
+Xedis is a lightweight, persistent, and crash-safe key-value database inspired by Redis. It is written in Rust and provides a simple command-line interface (CLI) and a server mode for client-server communication.
+
+## Features
+
+*   **Persistent Storage**: Data is saved to disk and can be retrieved later.
+*   **Crash Safety**: Xedis uses a Write-Ahead Log (WAL) to ensure data integrity even in case of a crash.
+*   **Concurrency Control**: A lock file mechanism prevents multiple processes from using the same database simultaneously.
+*   **Key-Value Operations**: Supports basic CRUD operations like `SET`, `GET`, and `DELETE`.
+*   **Key Expiration**: Keys can be set with an expiration time.
+*   **Interactive CLI**: An easy-to-use CLI for interacting with the database.
+*   **Server Mode**: Can be run as a TCP server to handle multiple clients.
+*   **Cross-Platform**: Built with Rust, it can be compiled for various platforms.
+
+## Tech Stack
+
+*   **Language**: [Rust](https://www.rust-lang.org/)
+*   **Serialization/Deserialization**: [Serde](https://serde.rs/)
+
+## How to Run
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/your-username/xedis.git
+    cd xedis
+    ```
+
+2.  **Build the project**:
+    ```bash
+    cargo build --release
+    ```
+
+3.  **Run Xedis**:
+    You can run Xedis in two modes:
+
+    *   **Interactive CLI**:
+        ```bash
+        ./target/release/xedis
+        ```
+        This will start the interactive CLI.
+
+    *   **Server Mode**:
+        ```bash
+        ./target/release/xedis
+        ```
+        Then choose option 4 to start the server. The server will start at `127.0.0.1:7878`.
+
+## Usage Example
+
+### Interactive CLI
+
+```bash
+$ ./target/release/xedis
+Choose mode:
+1. Interactive CLI (like real database)
+2. Persistence demo
+3. Crash recovery demo
+4. Start server
+Enter choice (1-4): 1
+🚀 Welcome to Xedis DB - Your Simple Database!
+✨ Features: Crash Safety, Concurrency Control, Write-Ahead Logging
+💡 Type HELP for commands, QUIT to exit
+
+Xedis db > SET name Alice
+ok stored 'name'
+Xedis db > GET name
+value:  Alice
+Xedis db > SET age 30 EX 10
+ok stored 'age' with expiration at 1728026410
+Xedis db > GET age
+value:  30
+Xedis db > KEYS
+Keys: name, age
+Xedis db > SAVE
+Manual checkpoint completed - database saved atomically
+Xedis db > QUIT
+👋 Goodbye! Your data is safely saved.
+```
+
+### Python Client
+
+You can use the provided Python client (`client.py`) to connect to the Xedis server.
+
+1.  **Start the Xedis server** (as shown above).
+2.  **Run the Python client**:
+    ```bash
+    python client.py
+    ```
+
+**Example session**:
+```
+$ python client.py
+Connected to Xedis server at 127.0.0.1:7878
+Enter commands to send to the server. Type 'exit' to close.
+> SET city "New York"
+Server response: ok stored 'city'
+> GET city
+Server response: value:  "New York"
+> exit
+```
+
+## Commands
+
+| Command      | Description                                               |
+|--------------|-----------------------------------------------------------|
+| `SET <k> <v>`| Set a key-value pair.                                     |
+| `GET <k>`    | Get the value of a key.                                   |
+| `DEL <k>`    | Delete a key.                                             |
+| `KEYS`       | List all keys.                                            |
+| `SIZE`       | Get the number of keys.                                   |
+| `SAVE`       | Manually save the database.                               |
+| `STATS`      | Get database statistics.                                  |
+| `CRASH`      | Simulate a crash (for testing).                           |
+| `HELP`       | Show help.                                                |
+| `QUIT`       | Quit the interactive CLI.                                 |
+
+## Future Scope
+
+*   **More Data Types**: Add support for more data types like lists, sets, and hashes.
+*   **Transactions**: Implement transactions for atomic operations on multiple keys.
+*   **Replication**: Add support for master-slave replication.
+*   **Clustering**: Implement clustering for horizontal scaling.
+*   **Improved Security**: Add authentication and authorization mechanisms.
+*   **GUI Client**: A graphical user interface for easier database management.
+
