@@ -1,8 +1,6 @@
-import { BackgroundCircles } from "@/components/background-circle";
-import Blogs from "@/components/blogs";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import Image from "next/image";
+import BackgroundCircles from "@/components/background-circles-client";
 
 // proof of work page should be in the middle
 export default function Home() {
