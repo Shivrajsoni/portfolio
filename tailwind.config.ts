@@ -73,6 +73,17 @@ const config: Config = {
         'custom-light': '0_2px_20px_-2px_rgba(0,0,0,0.1)',
         'custom-dark': '0_2px_20px_-2px_rgba(0,0,0,0.3)', // Adjusted for dark mode
       },
+      animation: {
+        scroll:
+          "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
+      },
+      keyframes: {
+        scroll: {
+          to: {
+            transform: "translate(calc(-50% - 0.5rem))",
+          },
+        },
+      },
     },
   },
   plugins: [],

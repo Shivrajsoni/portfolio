@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  reactStrictMode: false
+  reactStrictMode: true
 };
 
 export default nextConfig;
