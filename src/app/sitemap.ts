@@ -4,7 +4,7 @@ import { getAllProjectSlugs } from '@/lib/project-utils';
 import { getAllProofOfWorkSlugs } from '@/lib/proof-of-work-utils';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://shivrajsoni.com"; // !TODO: Replace with your domain
+  const baseUrl = "https://shivraj.online"; // !TODO: Replace with your domain
 
   const blogUrls = getAllBlogSlugs().map(slug => ({
     url: `${baseUrl}/blog/${slug}`,

@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/admin/',
     },
-    sitemap: 'https://shivrajsoni.com/sitemap.xml', // !TODO: Replace with your domain
+    sitemap: 'https://shivraj.online/sitemap.xml', // !TODO: Replace with your domain
   }
 }
