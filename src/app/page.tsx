@@ -3,6 +3,7 @@ import Header from "@/components/header";
 import BackgroundCircles from "@/components/background-circles-client";
 import Experience_Button from "@/components/experience_button";
 import ExperienceSection from "@/components/experience_section";
+import SongPlayer from "@/components/SongPlayer";
 
 // proof of work page should be in the middle
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
         </div>
         <div className="h-[60vh]" />
       </div>
+      <SongPlayer />
       <Footer />
     </div>
   );
