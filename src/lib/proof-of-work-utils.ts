@@ -106,15 +106,21 @@ export async function getAllProofOfWork(): Promise<ProofOfWorkMeta[]> {
     })
     .filter(Boolean)
     .sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     ) as ProofOfWorkMeta[];
 
   return allPostsData;
 }
 
+// Get featured proof of work posts
+export async function getFeaturedProofOfWork(): Promise<ProofOfWorkMeta[]> {
+  const all = await getAllProofOfWork();
+  return all.filter((entry) => entry.featured);
+}
+
 // Get a single proof of work by slug
 export async function getProofOfWorkBySlug(
-  slug: string
+  slug: string,
 ): Promise<ProofOfWorkPost | null> {
   const actualProofOfWorkDirectory = getProofOfWorkDirectory();
   const fullPath = path.join(actualProofOfWorkDirectory, `${slug}.mdx`);
@@ -172,7 +178,7 @@ export function getAllProofOfWorkSlugs(): string[] {
 export async function createProofOfWork(
   data: Omit<ProofOfWorkPost, "slug" | "readTime" | "content"> & {
     content: string;
-  }
+  },
 ): Promise<ProofOfWorkMeta> {
   const actualProofOfWorkDirectory = getProofOfWorkDirectory();
   const slug = data.title
@@ -218,7 +224,7 @@ export async function updateProofOfWork(
   slug: string,
   data: Omit<ProofOfWorkPost, "slug" | "readTime" | "content"> & {
     content: string;
-  }
+  },
 ): Promise<ProofOfWorkMeta> {
   const actualProofOfWorkDirectory = getProofOfWorkDirectory();
   const fullPath = path.join(actualProofOfWorkDirectory, `${slug}.mdx`);

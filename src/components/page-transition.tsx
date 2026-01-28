@@ -2,25 +2,28 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import { useRef } from "react";
 
 interface PageTransitionProps {
   children: React.ReactNode;
 }
 
-const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
+const PageTransition = ({ children }: PageTransitionProps) => {
   const pathname = usePathname();
-  const [isInitialRender, setIsInitialRender] = useState(true);
+  const isInitialMount = useRef(true);
 
-  useEffect(() => {
-    setIsInitialRender(false);
-  }, []);
+  // Skip animation on initial mount
+  if (isInitialMount.current) {
+    isInitialMount.current = false;
+    return <>{children}</>;
+  }
 
+  // Animate on subsequent pathname changes
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={pathname}
-        initial={isInitialRender ? false : { opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 15 }}
         transition={{ duration: 0.35, ease: "easeInOut" }}

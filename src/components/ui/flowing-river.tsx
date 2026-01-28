@@ -1,8 +1,7 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { useTheme } from 'next-themes';
-import { useState, useEffect } from 'react';
+import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 // This component contains the previous design that you liked for dark mode.
 const DarkModeRiver = () => (
@@ -37,27 +36,27 @@ const DarkModeRiver = () => (
         href="#wave1-dark"
         fill="url(#riverGradientDark)"
         animate={{ x: [0, -1000] }}
-        transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
       />
       <motion.use
         href="#wave2-dark"
         fill="url(#riverGradientDark)"
         className="opacity-70"
         animate={{ x: [0, 1000] }}
-        transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
       />
       <motion.use
         href="#shimmer-dark"
         className="stroke-orange-300/80"
         animate={{
-          strokeDasharray: ['0, 20, 15, 5, 30, 200', '15, 5, 30, 20, 0, 200'],
+          strokeDasharray: ["0, 20, 15, 5, 30, 200", "15, 5, 30, 20, 0, 200"],
           opacity: [0.8, 0.5, 0.8, 0.3, 1, 0.8, 0.5],
         }}
         transition={{
           duration: 5,
           repeat: Infinity,
-          repeatType: 'mirror',
-          ease: 'easeInOut',
+          repeatType: "mirror",
+          ease: "easeInOut",
         }}
       />
     </g>
@@ -66,7 +65,7 @@ const DarkModeRiver = () => (
 
 // This component contains the new, more vibrant design for light mode.
 const LightModeRiver = () => (
-    <svg
+  <svg
     className="absolute bottom-0 left-0 w-full h-full"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 1000 200"
@@ -85,7 +84,7 @@ const LightModeRiver = () => (
         id="wave2-light"
         d="M-1000 110 Q-750 140 -500 110 T 0 110 T 500 110 T 1000 110 T 1500 110 V 200 H -1000 Z"
       />
-       <path
+      <path
         id="wave3-light"
         d="M-1000 115 Q-750 150 -500 115 T 0 115 T 500 115 T 1000 115 T 1500 115 V 200 H -1000 Z"
       />
@@ -97,38 +96,38 @@ const LightModeRiver = () => (
       />
     </defs>
     <g className="waves">
-        <motion.use
+      <motion.use
         href="#wave3-light"
         fill="url(#riverGradientLight)"
         className="opacity-80"
         animate={{ x: [0, 1000] }}
-        transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
       />
       <motion.use
         href="#wave1-light"
         fill="url(#riverGradientLight)"
         animate={{ x: [0, -1000] }}
-        transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
       />
       <motion.use
         href="#wave2-light"
         fill="url(#riverGradientLight)"
         className="opacity-60"
         animate={{ x: [0, 1000] }}
-        transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
       />
       <motion.use
         href="#shimmer-light"
         className="stroke-white/80"
         animate={{
-          strokeDasharray: ['0, 20, 15, 5, 30, 200', '15, 5, 30, 20, 0, 200'],
+          strokeDasharray: ["0, 20, 15, 5, 30, 200", "15, 5, 30, 20, 0, 200"],
           opacity: [0.8, 0.5, 0.8, 0.3, 1, 0.8, 0.5],
         }}
         transition={{
           duration: 5,
           repeat: Infinity,
-          repeatType: 'mirror',
-          ease: 'easeInOut',
+          repeatType: "mirror",
+          ease: "easeInOut",
         }}
       />
     </g>
@@ -136,23 +135,12 @@ const LightModeRiver = () => (
 );
 
 const FlowingRiver = () => {
-  const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // We need to wait for the component to mount to know the current theme.
-  if (!mounted) {
-    // Render a placeholder to avoid layout shift.
-    return <div className="relative w-full h-48 md:h-64 -mt-16" />;
-  }
+  const { resolvedTheme } = useTheme();
 
   return (
     <div className="relative w-full h-48 md:h-64 -mt-16">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-emerald-300/30 via-transparent to-transparent dark:from-blue-500/30 blur-xl" />
-      {theme === 'dark' ? <DarkModeRiver /> : <LightModeRiver />}
+      {resolvedTheme === "dark" ? <DarkModeRiver /> : <LightModeRiver />}
     </div>
   );
 };

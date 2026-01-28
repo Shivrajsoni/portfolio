@@ -1,10 +1,17 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { BlogMeta } from "@/lib/blog-utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface BlogsProps {
   initialBlogs: BlogMeta[];
@@ -12,7 +19,9 @@ interface BlogsProps {
 
 const Blogs = ({ initialBlogs }: BlogsProps) => {
   const [allBlogs] = useState<BlogMeta[]>(initialBlogs || []);
-  const [filteredBlogs, setFilteredBlogs] = useState<BlogMeta[]>(initialBlogs || []);
+  const [filteredBlogs, setFilteredBlogs] = useState<BlogMeta[]>(
+    initialBlogs || []
+  );
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string>("All");
 
@@ -57,7 +66,9 @@ const Blogs = ({ initialBlogs }: BlogsProps) => {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="mb-12">
-          <h1 className="text-5xl font-bold  mb-16 text-foreground tracking-tighter">Blogs</h1>
+          <h1 className="text-5xl font-bold  mb-16 text-foreground tracking-tighter">
+            Blogs
+          </h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-8">

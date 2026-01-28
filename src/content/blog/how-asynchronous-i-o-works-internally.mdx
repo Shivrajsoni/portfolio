@@ -1,51 +1,31 @@
 ---
-title: "How Asynchronous I/O Works Internally in Rust  ?"
+title: "How Asynchronous I/O Works Internally in Rust"
 date: "2025-08-29"
-excerpt: "You know it's about non-blocking, but the real magic is in the cooperation between the programming language, the runtime, and the operating system..."
+excerpt: "It's not magic—it's a 3-layer dance between the OS, the language, and a runtime. Here's how it actually works."
 tags: ["OS", "Rust", "Technical"]
 author: "Shivraj Soni"
-featured: false
+featured: true
 ---
 
 # Async in Rust: Reactor, Future, and Executor
 
-Rust’s `async` is not some black-box magic.  
-It’s a **3-layer system** that uses the operating system, language features, and a runtime to let you handle thousands of tasks without burning thousands of threads.  
-
-We’ll break it down step by step.
+Rust’s `async` isn’t a black box. Under the hood it’s a three-layer system: the OS tells you when I/O is ready, the language gives you futures (state machines), and a runtime keeps polling until things are done. Once you see how those pieces fit together, a lot of the “how does this even work?” feeling goes away.
 
 ---
 
-## 1. Reactor Pattern (OS Level)
+## The Reactor: Let the OS Do the Waiting
 
-At the bottom, the **operating system** provides an efficient way to monitor many I/O events at once.
+At the bottom, the operating system already knows how to watch a bunch of I/O sources at once. The old, naive way is to sit in a loop and keep asking: “Hey socket, got data yet? No? How about now?” That burns CPU and doesn’t scale.
 
-Instead of looping and asking:
-> "Hey socket, got data yet? No? How about now? Now??"
+The smarter approach: hand the OS a list of sockets (or file descriptors) and say, “Wake me when any of these is ready.” One thread can then drive thousands of connections. On Linux that’s `epoll`; on macOS/BSD it’s `kqueue`; on Windows it’s IOCP (Proactor-style). The idea is the same: the OS does the waiting, and your code only runs when there’s actual work.
 
-We ask the OS:
-> "Here’s a list of sockets. Please wake me up when any of them is ready."
-
-This is called the **Reactor Pattern**.
-
-- **Linux:** `epoll`  
-- **macOS/BSD:** `kqueue`  
-- **Windows:** IOCP (slightly different, Proactor style)  
-- **Old times:** `select` / `poll`  
-
-### Example flow (with epoll):
-1. Register file descriptors/sockets with `epoll`.  
-2. Call `epoll_wait()` → runtime goes to sleep.  
-3. OS wakes it up when an event happens.  
-4. Runtime dispatches the right handler for that event.  
-
-👉 That’s how a single thread can handle **10,000 connections** without collapsing.
+So the flow looks like: register your sockets with the reactor, call something like `epoll_wait()`, and the runtime sleeps until the OS says “this one’s ready.” Then you dispatch to the right handler. No busy-looping. That’s how a single thread can handle tens of thousands of connections without melting.
 
 ---
 
-## 2. Futures (Language Level)
+## Futures: What Your `async fn` Really Is
 
-When you write this in Rust:
+When you write:
 
 ```rust
 async fn fetch_data() -> String {
@@ -53,72 +33,19 @@ async fn fetch_data() -> String {
 }
 ```
 
-## The Executor: Driving Futures to Completion 
-
-So far, we’ve seen how the **Reactor** (OS-level event notification) and **Futures** (Rust state machines) fit into async programming.  
-But there’s still one missing piece:  
-
-👉 **Who keeps polling the futures until they’re done?**  
-
-That’s the **Executor**.  
-Think of it as the **event loop** of your async program.
+the compiler turns that into a state machine. It doesn’t run the function to completion in one go; it produces a value (a Future) that can be _polled_. Each time you call `poll()`, the future does a bit of work and either returns “I’m done, here’s the result” or “I’m still waiting (e.g. on I/O), ask me again later.” So “async” in Rust is really: your function becomes a lazy, resumable computation that the runtime drives by repeatedly calling `poll()`.
 
 ---
 
-## How the Executor Works
+## The Executor: What Actually Runs the Futures
 
-Here’s the step-by-step cycle:
+The reactor knows _when_ I/O is ready. Futures describe _what_ to do. But something has to actually run the futures—call `poll()`, and when they say “pending,” put them aside until their I/O is ready. That something is the **executor**.
 
-1. **Keep a queue of tasks (futures).**  
-   These are all the computations waiting to run.
+You can think of it as the event loop. It holds a queue of tasks (futures), picks one, calls `poll()`. If the future returns “Ready,” the task is done. If it returns “Pending,” the future typically gives the executor a **Waker**: a callback that means “when my I/O is ready, put me back in the runnable queue.” The executor then parks that task and moves on. When there’s nothing runnable, it goes to sleep by calling into the OS (e.g. `epoll_wait()`). When the OS says “this socket has data,” the right Waker is called, the task goes back on the queue, and the loop continues. No thread per task, no busy-waiting—just a single loop that drives everything.
 
-2. **Pick one task → call `poll()`.**  
-   This checks if the future can make progress.
+A simple mental model: a teacher (executor) walking around the class (futures). They ask each student “done with your homework?” If yes, they collect it. If not, the student says “I’ll raise my hand when I’m ready.” The teacher doesn’t stand there staring; they go do something else or take a nap until someone raises their hand. That’s the same idea: the executor only spends CPU on tasks that can make progress, and the OS tells it when I/O is ready.
 
-3. **If it’s `Ready` → it’s done.**  
-   The result is available, and the task can be removed.
-
-4. **If it’s `Pending` → park it until its Waker fires.**  
-   The future isn’t ready yet (maybe waiting on I/O).  
-   It hands the executor a **Waker**, saying:  
-   > "When my socket/data is ready, call me again."
-
-5. **If nothing is ready → nap.**  
-   The executor calls the OS (`epoll_wait()` on Linux, `kqueue` on macOS, `IOCP` on Windows) and sleeps.  
-   No CPU is wasted.
-
-6. **When the OS signals readiness → wake the right task.**  
-   That task is put back into the runnable queue.
-
-7. **Repeat forever.**  
-   This loop is efficient, non-blocking, and lets thousands of tasks share just a few threads.
-
----
-
-## Simple Analogy
-
-Imagine a teacher (Executor) with a class full of students (Futures).  
-
-- The teacher goes desk to desk asking:  
-  > "Are you done with your homework?"  
-- If a student says **"Yes" (Ready)** → check the homework and move on.  
-- If a student says **"Not yet" (Pending)** → the student raises their hand (Waker) when they’re ready.  
-- If nobody is ready, the teacher takes a nap until someone calls them.
-
-That’s basically async Rust.
-
----
-
-### In Summary
-
-The **Executor** is the engine that drives async Rust:
-
-- It runs a queue of tasks.
-- It polls futures until they’re done.
-- It cooperates with the OS Reactor (`epoll`, `kqueue`, `IOCP`) to avoid wasting CPU.
-- It uses **Wakers** to know when a task should be retried.
-
-⚡ Without the Executor, futures would never make progress.  
+So in short: the **reactor** (OS) handles “when is I/O ready?” The **future** (Rust) is “what computation to run.” The **executor** is “run the futures, and when they’re waiting on I/O, sleep until the reactor says it’s ready.” Together they give you async I/O that scales.
 
 ---
 
@@ -131,9 +58,9 @@ loop {
             Pending => park_task(task), // waits for Waker
         }
     } else {
-        // No tasks ready → wait for OS to signal
         os_reactor_wait();
     }
 }
-``` 
-Thnx for read
+```
+
+Hope this makes the internals a bit less mysterious. If you want to go deeper, the next step is to read how Wakers are created and how they hook into the reactor—that’s where the “wake me when this socket is ready” wiring lives.

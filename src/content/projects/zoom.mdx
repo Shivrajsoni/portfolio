@@ -1,6 +1,6 @@
 ---
 title: "Xoom"
-excerpt: "Xoom is a full-stack Zoom alternative .."
+excerpt: "A Zoom-style video conferencing app—create rooms, join by ID, record meetings. Built to learn WebRTC and Stream."
 date: "2025-10-03"
 tags: ["Full Stack", "Stream", "WebRTC"]
 author: "Shivraj Soni"
@@ -8,74 +8,43 @@ featured: false
 liveLink: " https://xoom-shiv.vercel.app/"
 ---
 
-# Xoom - Video Conferencing App
+# Xoom: Video Conferencing (Zoom-style)
 
-This is a real-time video conferencing application built with modern web technologies. It aims to provide a seamless and feature-rich experience for virtual meetings.
+I built Xoom to get hands-on with real-time video: WebRTC, Stream’s SDK, and tying it into a full app. You get auth (Clerk), create or schedule meetings, join with a meeting ID, and each user has a personal room. There’s a list of upcoming and past meetings, and you can view recordings. In-call you get basic controls (e.g. end call). Layout is responsive so it works on different screen sizes.
 
-## Description
+It’s not a full Zoom replacement—it’s a focused project to learn the stack and ship something usable.
 
-Xoom is a full-stack web application that allows users to create, schedule, and join video meetings. It includes features for managing meetings, viewing recordings, and maintaining a personal meeting room. The application is built with a focus on performance, scalability, and user experience.
+---
 
-## Functionalities
+## Running it locally
 
-*   **User Authentication:** Secure sign-up and sign-in functionality using Clerk.
-*   **Create Meetings:** Instantly create new meetings.
-*   **Schedule Meetings:** Schedule meetings for a future date and time.
-*   **Join Meetings:** Join existing meetings with a meeting ID.
-*   **Personal Meeting Room:** A dedicated room for each user.
-*   **Upcoming Meetings:** View a list of all your upcoming meetings.
-*   **Previous Meetings:** View a list of all your past meetings.
-*   **Meeting Recordings:** View and manage recordings of your meetings.
-*   **In-Meeting Controls:** Basic controls like ending a call.
-*   **Responsive Design:** The application is designed to work on various screen sizes.
+```bash
+git clone https://github.com/Shivrajsoni/xoom.git
+cd xoom
+bun install
+```
 
-## Example Code Run
+Create `.env.local` with:
 
-To run the project locally, follow these steps:
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_STREAM_API_KEY` and `STREAM_SECRET_KEY`
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/your-username/xoom.git
-    cd xoom
-    ```
+Then:
 
-2.  **Install dependencies:**
-    ```bash
-    bun install
-    ```
+```bash
+bun dev
+```
 
-3.  **Set up environment variables:**
-    Create a `.env.local` file in the root of the project and add the following environment variables:
+App runs at `http://localhost:3000`.
 
-    ```
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-    CLERK_SECRET_KEY=your_clerk_secret_key
+---
 
-    NEXT_PUBLIC_STREAM_API_KEY=your_stream_api_key
-    STREAM_SECRET_KEY=your_stream_secret_key
-    ```
+## Tech
 
-4.  **Run the development server:**
-    ```bash
-    bun dev
-    ```
+Next.js, TypeScript, Clerk for auth, [Stream](https://getstream.io/) for video, Tailwind, shadcn/ui, Bun.
 
-    The application will be available at `http://localhost:3000`.
+---
 
-## Tech Stack
+## Things I’d add next
 
-*   **Framework:** [Next.js](https://nextjs.org/)
-*   **Language:** [TypeScript](https://www.typescriptlang.org/)
-*   **Authentication:** [Clerk](https://clerk.com/)
-*   **Video Streaming:** [Stream.io](https://getstream.io/)
-*   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-*   **UI Components:** [Shadcn/ui](https://ui.shadcn.com/)
-*   **Package Manager:** [Bun](https://bun.sh/)
-
-## Futures
-
-*   **Chat:** Real-time chat functionality within meetings.
-*   **Screen Sharing:** Ability to share your screen with other participants.
-*   **Meeting Layouts:** Different layouts for video participants (e.g., grid, speaker view).
-*   **Reactions and Polls:** Interactive features like reactions and polls.
-*   **Virtual Backgrounds:** Ability to change your background during a meeting.
+In-meeting chat, screen share, different layouts (grid vs speaker), reactions/polls, and virtual backgrounds. If you’re building something similar, the repo is a good starting point for how to wire Stream + Next + Clerk together.

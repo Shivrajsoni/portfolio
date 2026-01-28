@@ -9,6 +9,7 @@ interface BackgroundCirclesProps {
   title?: string;
   className?: string;
   variant?: keyof typeof COLOR_VARIANTS;
+  scrollTargetRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 const COLOR_VARIANTS = {
@@ -70,6 +71,26 @@ const COLOR_VARIANTS = {
   },
 } as const;
 
+/** Fallback radial gradients (Tailwind's --tw-color-* in arbitrary values often doesn't resolve) */
+const RADIAL_BY_VARIANT: Record<keyof typeof COLOR_VARIANTS, string> = {
+  primary:
+    "bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.15),transparent_70%)]",
+  secondary:
+    "bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.15),transparent_70%)]",
+  tertiary:
+    "bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.15),transparent_70%)]",
+  quaternary:
+    "bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.15),transparent_70%)]",
+  quinary:
+    "bg-[radial-gradient(ellipse_at_center,rgba(244,63,94,0.15),transparent_70%)]",
+  senary:
+    "bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.15),transparent_70%)]",
+  septenary:
+    "bg-[radial-gradient(ellipse_at_center,rgba(107,114,128,0.15),transparent_70%)]",
+  octonary:
+    "bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.15),transparent_70%)]",
+};
+
 const AnimatedGrid = () => (
   <motion.div
     className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,transparent_30%,black)]"
@@ -87,19 +108,22 @@ const AnimatedGrid = () => (
 );
 
 export function BackgroundCircles({
-  title = "Background Circles",
+  title = "Life goes Circular",
   className,
   variant: initialVariant = "octonary",
+  scrollTargetRef,
 }: BackgroundCirclesProps) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const targetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const variant = theme === "light" ? "quaternary" : initialVariant;
-  const targetRef = useRef<HTMLDivElement>(null);
+  // Resolved theme so variant (and border/radial colors) are correct; avoids "system" / undefined
+  const variant = resolvedTheme === "light" ? "quaternary" : initialVariant;
+  const scrollRef = scrollTargetRef ?? targetRef;
 
   return (
     <>
@@ -109,7 +133,7 @@ export function BackgroundCircles({
       />
       {mounted && (
         <ScrollAnimatedContent
-          targetRef={targetRef}
+          targetRef={scrollRef}
           variant={variant}
           title={title}
         />
@@ -119,7 +143,7 @@ export function BackgroundCircles({
 }
 
 interface ScrollAnimatedContentProps {
-  targetRef: React.RefObject<HTMLDivElement>;
+  targetRef: React.RefObject<HTMLDivElement | null>;
   variant: keyof typeof COLOR_VARIANTS;
   title: string;
 }
@@ -155,9 +179,9 @@ function ScrollAnimatedContent({
             key={i}
             className={clsx(
               "absolute inset-0 rounded-full",
-              "border-2 bg-gradient-to-br", // Changed to standard Tailwind class
-              variantStyles.border[i],
-              variantStyles.gradient
+              "border-2 bg-gradient-to-br",
+              variantStyles.border[i % 3],
+              variantStyles.gradient,
             )}
             animate={{
               rotate: 360,
@@ -173,7 +197,7 @@ function ScrollAnimatedContent({
             <div
               className={clsx(
                 "absolute inset-0 rounded-full mix-blend-screen",
-                `bg-[radial-gradient(ellipse_at_center,rgba(var(--tw-color-${variantStyles.radial}),0.1),transparent_70%)]` // Using CSS variable for radial gradient
+                RADIAL_BY_VARIANT[variant],
               )}
             />
           </motion.div>
@@ -188,7 +212,7 @@ function ScrollAnimatedContent({
           className={clsx(
             "text-5xl font-bold tracking-tight md:text-7xl",
             "bg-gradient-to-b from-slate-600 to-slate-300 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent",
-            "drop-shadow-[0_0_32px_rgba(94,234,212,0.4)]"
+            "drop-shadow-[0_0_32px_rgba(94,234,212,0.4)]",
           )}
         >
           {title}
@@ -202,13 +226,12 @@ function ScrollAnimatedContent({
     </motion.div>
   );
 }
-
 export default function DemoCircles() {
   const [currentVariant, setCurrentVariant] =
     useState<keyof typeof COLOR_VARIANTS>("octonary");
 
   const variants = Object.keys(
-    COLOR_VARIANTS
+    COLOR_VARIANTS,
   ) as (keyof typeof COLOR_VARIANTS)[];
 
   function getNextVariant() {

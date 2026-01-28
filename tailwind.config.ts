@@ -76,12 +76,24 @@ const config: Config = {
       animation: {
         scroll:
           "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
+        "barricade-stripes":
+          "barricade-stripes 4s linear infinite",
+        "barricade-stripes-reverse":
+          "barricade-stripes-reverse 4s linear infinite",
       },
       keyframes: {
         scroll: {
           to: {
             transform: "translate(calc(-50% - 0.5rem))",
           },
+        },
+        "barricade-stripes": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "100%": { backgroundPosition: "100% 50%" },
+        },
+        "barricade-stripes-reverse": {
+          "0%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
         },
       },
     },

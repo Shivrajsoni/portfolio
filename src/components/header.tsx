@@ -1,10 +1,10 @@
 "use client";
 import { useTheme } from "next-themes";
-import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { GlassMenuEffect } from "@/components/ui/glass-menu-effect";
 import {
   Menu,
   Github,
@@ -48,16 +48,7 @@ const navLinks = [
 ];
 
 const Header = () => {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
+  const { setTheme, resolvedTheme } = useTheme();
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -74,11 +65,7 @@ const Header = () => {
               animate={{ y: 0 }}
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
               className={`flex items-center justify-between 
-                bg-background/80
                 shadow-custom-light dark:shadow-custom-dark
-                backdrop-blur-md
-                border-x border-b
-                border-[rgba(230,230,230,0.7)] dark:border-[rgba(70,70,70,0.7)]
                 w-full sm:min-w-[800px] sm:max-w-[1200px]
                 rounded-b-[28px]
                 px-4 py-2.5
@@ -86,6 +73,9 @@ const Header = () => {
                 transition-all duration-300 ease-in-out
                 `}
             >
+              {/* Glass Menu Effect */}
+              <GlassMenuEffect rounded="rounded-b-[28px]" />
+
               <div className="relative z-10 flex items-center justify-between w-full gap-2">
                 <div className="flex items-center gap-6">
                   <Link href="/" className="flex items-center gap-2">
@@ -172,11 +162,11 @@ const Header = () => {
                       size="icon"
                       className="h-9 w-9 text-muted-foreground hover:text-foreground"
                       onClick={() =>
-                        setTheme(theme === "dark" ? "light" : "dark")
+                        setTheme(resolvedTheme === "dark" ? "light" : "dark")
                       }
                       aria-label="Toggle theme"
                     >
-                      {theme === "dark" ? (
+                      {resolvedTheme === "dark" ? (
                         <Moon className="h-5 w-5" />
                       ) : (
                         <Sun className="h-5 w-5" />
@@ -251,11 +241,13 @@ const Header = () => {
                               size="icon"
                               className="h-9 w-9 text-muted-foreground hover:text-foreground"
                               onClick={() =>
-                                setTheme(theme === "dark" ? "light" : "dark")
+                                setTheme(
+                                  resolvedTheme === "dark" ? "light" : "dark"
+                                )
                               }
                               aria-label="Toggle theme"
                             >
-                              {theme === "dark" ? (
+                              {resolvedTheme === "dark" ? (
                                 <Moon className="h-5 w-5" />
                               ) : (
                                 <Sun className="h-5 w-5" />

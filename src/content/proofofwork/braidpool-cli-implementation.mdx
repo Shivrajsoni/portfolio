@@ -1,0 +1,17 @@
+---
+title: 'Braidpool cli Implementation '
+type: 'Bitcoin '
+date: '2026-01-28'
+excerpt: 'Implemented braidpool cli , and added approx 15 new rpc endpoints '
+tags:
+  - Rust
+liveLink: 'https://github.com/braidpool/braidpool/pull/333'
+organization: Braidpool
+hardnessLevel: 'Medium '
+featured: true
+---
+***RPC Server and Braidpool-cli implementation***
+Adds JSON-RPC server for the Braidpool node with endpoints for querying braid data, mining info, peer management, and Bitcoin RPC proxying.
+
+***Implemented Methods***
+Most RPC methods are implemented by reading from shared state (braid, peer manager, stratum connections) and returning the requested data. Methods like getbead, getbeadcount, gettips, getmininginfo, getpeerinfo etc. query the in-memory braid structure and return JSON responses. The bitcoinproxy method forwards requests directly to Bitcoin Core via HTTP JSON-RPC.

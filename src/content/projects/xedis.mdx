@@ -1,64 +1,33 @@
 ---
 title: "xedis"
-excerpt: "Rust Implementation of redis"
+excerpt: "A minimal Redis-style key-value store in Rust—persistent, crash-safe, and fun to hack on."
 date: "2025-10-03"
 tags: ["Rust"]
 author: "Shivraj Soni"
-featured: false
+featured: true
 liveLink: "https://github.com/Shivrajsoni/xedis"
 ---
 
-# Xedis: A Simple, Persistent, Crash-Safe Key-Value Database
+# Xedis: A Redis-Style Key-Value Store in Rust
 
-Xedis is a lightweight, persistent, and crash-safe key-value database inspired by Redis. It is written in Rust and provides a simple command-line interface (CLI) and a server mode for client-server communication.
+I wanted to understand how something like Redis could be simple and still durable—so I built Xedis. It’s a small key-value database in Rust: you get `SET`, `GET`, `DEL`, keys with optional expiry, and data that survives restarts (and crashes) thanks to a write-ahead log. No fancy clustering—just a single process, a lock file so two instances don’t step on each other, and a CLI or a TCP server if you want to talk to it from another app.
 
-## Features
+You can use it as an interactive CLI or run it as a server and hit it from the included Python client (or anything that speaks plain text over TCP).
 
-*   **Persistent Storage**: Data is saved to disk and can be retrieved later.
-*   **Crash Safety**: Xedis uses a Write-Ahead Log (WAL) to ensure data integrity even in case of a crash.
-*   **Concurrency Control**: A lock file mechanism prevents multiple processes from using the same database simultaneously.
-*   **Key-Value Operations**: Supports basic CRUD operations like `SET`, `GET`, and `DELETE`.
-*   **Key Expiration**: Keys can be set with an expiration time.
-*   **Interactive CLI**: An easy-to-use CLI for interacting with the database.
-*   **Server Mode**: Can be run as a TCP server to handle multiple clients.
-*   **Cross-Platform**: Built with Rust, it can be compiled for various platforms.
+## Running it
 
-## Tech Stack
+Clone, build, then run:
 
-*   **Language**: [Rust](https://www.rust-lang.org/)
-*   **Serialization/Deserialization**: [Serde](https://serde.rs/)
+```bash
+git clone https://github.com/Shivrajsoni/xedis.git
+cd xedis
+cargo build --release
+./target/release/xedis
+```
 
-## How to Run
+At the prompt you can pick: interactive CLI, persistence demo, crash-recovery demo, or start the server. For the server, choose option 4; it listens on `127.0.0.1:7878`.
 
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/your-username/xedis.git
-    cd xedis
-    ```
-
-2.  **Build the project**:
-    ```bash
-    cargo build --release
-    ```
-
-3.  **Run Xedis**:
-    You can run Xedis in two modes:
-
-    *   **Interactive CLI**:
-        ```bash
-        ./target/release/xedis
-        ```
-        This will start the interactive CLI.
-
-    *   **Server Mode**:
-        ```bash
-        ./target/release/xedis
-        ```
-        Then choose option 4 to start the server. The server will start at `127.0.0.1:7878`.
-
-## Usage Example
-
-### Interactive CLI
+**Interactive CLI** — you get a REPL. Type `HELP` for commands, `QUIT` to exit. Example:
 
 ```bash
 $ ./target/release/xedis
@@ -78,8 +47,6 @@ Xedis db > GET name
 value:  Alice
 Xedis db > SET age 30 EX 10
 ok stored 'age' with expiration at 1728026410
-Xedis db > GET age
-value:  30
 Xedis db > KEYS
 Keys: name, age
 Xedis db > SAVE
@@ -88,17 +55,8 @@ Xedis db > QUIT
 👋 Goodbye! Your data is safely saved.
 ```
 
-### Python Client
+**Python client** — start the Xedis server, then in another terminal run `python client.py`. You can send the same kinds of commands (SET, GET, etc.) and see responses in the terminal.
 
-You can use the provided Python client (`client.py`) to connect to the Xedis server.
-
-1.  **Start the Xedis server** (as shown above).
-2.  **Run the Python client**:
-    ```bash
-    python client.py
-    ```
-
-**Example session**:
 ```
 $ python client.py
 Connected to Xedis server at 127.0.0.1:7878
@@ -110,27 +68,25 @@ Server response: value:  "New York"
 > exit
 ```
 
-## Commands
+## Commands (quick reference)
 
-| Command      | Description                                               |
-|--------------|-----------------------------------------------------------|
-| `SET <k> <v>`| Set a key-value pair.                                     |
-| `GET <k>`    | Get the value of a key.                                   |
-| `DEL <k>`    | Delete a key.                                             |
-| `KEYS`       | List all keys.                                            |
-| `SIZE`       | Get the number of keys.                                   |
-| `SAVE`       | Manually save the database.                               |
-| `STATS`      | Get database statistics.                                  |
-| `CRASH`      | Simulate a crash (for testing).                           |
-| `HELP`       | Show help.                                                |
-| `QUIT`       | Quit the interactive CLI.                                 |
+| Command       | What it does               |
+| ------------- | -------------------------- |
+| `SET <k> <v>` | Set a key-value pair       |
+| `GET <k>`     | Get the value for a key    |
+| `DEL <k>`     | Delete a key               |
+| `KEYS`        | List all keys              |
+| `SIZE`        | Number of keys             |
+| `SAVE`        | Manual checkpoint to disk  |
+| `STATS`       | Database stats             |
+| `CRASH`       | Simulate a crash (testing) |
+| `HELP`        | Show help                  |
+| `QUIT`        | Exit CLI                   |
 
-## Future Scope
+## Tech
 
-*   **More Data Types**: Add support for more data types like lists, sets, and hashes.
-*   **Transactions**: Implement transactions for atomic operations on multiple keys.
-*   **Replication**: Add support for master-slave replication.
-*   **Clustering**: Implement clustering for horizontal scaling.
-*   **Improved Security**: Add authentication and authorization mechanisms.
-*   **GUI Client**: A graphical user interface for easier database management.
+Rust, and [Serde](https://serde.rs/) for serialization. Data lives on disk via a WAL; the lock file keeps multiple processes from opening the same DB at once.
 
+## What’s next (maybe)
+
+I’d like to add more types (lists, sets), transactions, and perhaps replication or a simple GUI client—but for now it’s a solid little store to learn from or use locally.

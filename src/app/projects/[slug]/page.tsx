@@ -1,10 +1,11 @@
+import ProjectPage from "@/components/project-page";
 import { getAllProjectSlugs, getProjectBySlug } from "@/lib/project-utils";
-import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type Props = {
-  params: { slug: string }
-}
+  params: { slug: string };
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const project = await getProjectBySlug(params.slug);
@@ -26,9 +27,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: project.author ? [project.author] : [],
     },
     twitter: {
-        card: "summary_large_image",
-        title: project.title,
-        description: project.excerpt,
+      card: "summary_large_image",
+      title: project.title,
+      description: project.excerpt,
     },
   };
 }
@@ -48,35 +49,24 @@ const Page = async ({ params }: { params: { slug: string } }) => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
-    "name": project.title,
-    "description": project.excerpt,
-    "author": {
+    name: project.title,
+    description: project.excerpt,
+    author: {
       "@type": "Person",
-      "name": project.author || "Shivraj Soni" // !TODO: Replace with your default author name
+      name: project.author || "Shivraj Soni",
     },
-    "datePublished": project.date,
+    datePublished: project.date,
   };
 
   return (
-    <article className="prose prose-zinc mx-auto min-h-screen max-w-4xl p-8 dark:prose-invert">
-        <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-            key="project-structured-data"
-        />
-      <h1 className="mb-2 text-3xl font-bold">{project.title}</h1>
-      <p className="text-sm text-zinc-400">
-        {new Date(project.date).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </p>
-      <div
-        className="mt-8"
-        dangerouslySetInnerHTML={{ __html: project.content }}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        key="project-structured-data"
       />
-    </article>
+      <ProjectPage project={project} />
+    </>
   );
 };
 

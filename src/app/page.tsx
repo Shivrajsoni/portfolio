@@ -1,30 +1,34 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import BackgroundCircles from "@/components/background-circles-client";
-import Experience_Button from "@/components/experience_button";
-import ExperienceSection from "@/components/experience_section";
-import SongPlayer from "@/components/SongPlayer";
-import { Keypad, BackgroundBeams } from "@/components/ui/macbook-scroll";
+import HeroAndProfileWrapper from "@/components/hero-and-profile-wrapper";
+import ScrollSection from "@/components/scroll-section";
+import { getFeaturedBlogs } from "@/lib/blog-utils";
+import { getFeaturedProjects } from "@/lib/project-utils";
+import { getFeaturedProofOfWork } from "@/lib/proof-of-work-utils";
 
-// proof of work page should be in the middle
-export default function Home() {
+export default async function Home() {
+  const [featuredBlogs, featuredProjects, featuredProofOfWork] =
+    await Promise.all([
+      getFeaturedBlogs(),
+      getFeaturedProjects(),
+      getFeaturedProofOfWork(),
+    ]);
+
   return (
     <div className="relative min-h-screen flex-col bg-white dark:bg-black">
       <Header />
-      <BackgroundCircles />
-      <div className="relative z-10">
-        <div className="h-[60vh]" />
-        <div className="container mx-auto px-4 py-16">
-          <ExperienceSection />
-        </div>
-        <div className="relative w-full flex justify-center items-center my-16">
-          <BackgroundBeams />
-          <div className="transform scale-[0.8] sm:scale-100 md:scale-[1.35]">
-            <Keypad />
-          </div>
-        </div>
-      </div>
-      <SongPlayer />
+      <HeroAndProfileWrapper
+        featuredBlogs={featuredBlogs}
+        featuredProjects={featuredProjects}
+        featuredProofOfWork={featuredProofOfWork}
+      >
+        {/* <ScrollSection
+          title="Build for AI Agents"
+          subtitle="Create powerful AI agents that transform how you work and automate complex tasks"
+          cards={[]}
+        /> */}
+      </HeroAndProfileWrapper>
+
       <Footer />
     </div>
   );
