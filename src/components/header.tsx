@@ -58,7 +58,7 @@ const Header = () => {
   return (
     <>
       <div className="sticky left-0 right-0 top-0 z-40">
-        <div className="bg-white dark:bg-black/5 w-full">
+        <div className="bg-transparent w-full">
           <div className="flex items-center justify-center w-full flex-col ">
             <motion.header
               initial={{ y: -100 }}

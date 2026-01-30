@@ -121,8 +121,10 @@ export function BackgroundCircles({
     setMounted(true);
   }, []);
 
-  // Resolved theme so variant (and border/radial colors) are correct; avoids "system" / undefined
-  const variant = resolvedTheme === "light" ? "quaternary" : initialVariant;
+  // Resolved theme so variant (and border/radial colors) are correct; avoids "system" / undefined.
+  // Default to "light" when unresolved (e.g. dev hydration) so circles stay visible locally.
+  const variant =
+    (resolvedTheme ?? "light") === "light" ? "quaternary" : initialVariant;
   const scrollRef = scrollTargetRef ?? targetRef;
 
   return (
@@ -185,7 +187,7 @@ function ScrollAnimatedContent({
             )}
             animate={{
               rotate: 360,
-              scale: [1, 1.05 + i * 0.05, 1],
+              scale: [1, 1.03 + i * 0.035, 1],
               opacity: [0.8, 1, 0.8],
             }}
             transition={{
@@ -211,8 +213,12 @@ function ScrollAnimatedContent({
         <h1
           className={clsx(
             "text-5xl font-bold tracking-tight md:text-7xl",
-            "bg-gradient-to-b from-slate-600 to-slate-300 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent",
-            "drop-shadow-[0_0_32px_rgba(94,234,212,0.4)]",
+            // Light: gray gradient suited to white background
+            "bg-gradient-to-b from-slate-600 via-slate-500 to-slate-400 bg-clip-text text-transparent",
+            "drop-shadow-[0_2px_12px_rgba(0,0,0,0.06)]",
+            // Dark: bright slate gradient + teal glow
+            "dark:from-slate-100 dark:via-slate-200 dark:to-slate-300",
+            "dark:drop-shadow-[0_0_32px_rgba(94,234,212,0.4)]",
           )}
         >
           {title}

@@ -28,7 +28,7 @@ export function GlassMenuEffect({
       }}
     >
       <div
-        className={`absolute inset-0 backdrop-blur-md bg-white/5 border border-white/10 ${rounded}`}
+        className={`absolute inset-0 backdrop-blur-md bg-white/40 border border-zinc-200/50 dark:bg-white/5 dark:border-white/10 ${rounded}`}
         style={{
           transform: "translateZ(0)",
           willChange: "transform",

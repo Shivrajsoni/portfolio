@@ -28,6 +28,8 @@ const getProofOfWorkDirectory = () => {
 
 export type ProofOfWorkType = "oss" | "bounty" | "mentions";
 
+export type MergeStatus = "merged" | "open";
+
 export interface ProofOfWorkPost {
   slug: string;
   type: ProofOfWorkType;
@@ -41,6 +43,7 @@ export interface ProofOfWorkPost {
   organization?: string;
   hardnessLevel?: string;
   featured?: boolean;
+  mergeStatus?: MergeStatus;
 }
 
 export interface ProofOfWorkMeta {
@@ -55,6 +58,7 @@ export interface ProofOfWorkMeta {
   organization?: string;
   hardnessLevel?: string;
   featured?: boolean;
+  mergeStatus?: MergeStatus;
 }
 
 // Calculate reading time based on content length
@@ -102,6 +106,7 @@ export async function getAllProofOfWork(): Promise<ProofOfWorkMeta[]> {
         organization: data.organization,
         hardnessLevel: data.hardnessLevel,
         featured: data.featured || false,
+        mergeStatus: data.mergeStatus,
       };
     })
     .filter(Boolean)
@@ -156,6 +161,7 @@ export async function getProofOfWorkBySlug(
     organization: data.organization,
     hardnessLevel: data.hardnessLevel,
     featured: data.featured || false,
+    mergeStatus: data.mergeStatus,
   };
 }
 
@@ -202,6 +208,7 @@ export async function createProofOfWork(
     organization: data.organization || null,
     hardnessLevel: data.hardnessLevel || null,
     featured: data.featured || false,
+    mergeStatus: data.mergeStatus || null,
   };
 
   const fileContent = matter.stringify(data.content, frontMatter);
@@ -243,6 +250,7 @@ export async function updateProofOfWork(
     organization: data.organization || null,
     hardnessLevel: data.hardnessLevel || null,
     featured: data.featured || false,
+    mergeStatus: data.mergeStatus || null,
   };
 
   const fileContent = matter.stringify(data.content, frontMatter);
@@ -258,6 +266,30 @@ export async function updateProofOfWork(
     ...frontMatter,
     readTime: calculateReadTime(data.content),
   };
+}
+
+// Update only the featured flag for a proof of work entry (for admin quick-toggle)
+export async function updateProofOfWorkFeatured(
+  slug: string,
+  featured: boolean
+): Promise<boolean> {
+  const actualProofOfWorkDirectory = getProofOfWorkDirectory();
+  const fullPath = path.join(actualProofOfWorkDirectory, `${slug}.mdx`);
+
+  if (!fs.existsSync(fullPath)) {
+    return false;
+  }
+
+  try {
+    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const { data, content } = matter(fileContents);
+    const newContent = matter.stringify(content, { ...data, featured });
+    fs.writeFileSync(fullPath, newContent, "utf8");
+    return true;
+  } catch (error) {
+    console.error(`Error updating proof of work featured (${slug}):`, error);
+    return false;
+  }
 }
 
 // Delete a proof of work MDX file

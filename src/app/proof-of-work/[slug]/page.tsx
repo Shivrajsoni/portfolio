@@ -5,11 +5,12 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Metadata } from "next";
 
 type Props = {
-  params: { slug: string }
-}
+  params: Promise<{ slug: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const proofOfWork = await getProofOfWorkBySlug(params.slug);
+  const { slug } = await params;
+  const proofOfWork = await getProofOfWorkBySlug(slug);
 
   if (!proofOfWork) {
     return {
@@ -39,8 +40,9 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-const ProofOfWorkPage = async ({ params }: { params: { slug: string } }) => {
-  const proofOfWork = await getProofOfWorkBySlug(params.slug);
+const ProofOfWorkPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
+  const { slug } = await params;
+  const proofOfWork = await getProofOfWorkBySlug(slug);
 
   if (!proofOfWork) {
     notFound();

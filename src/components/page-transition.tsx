@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useRef } from "react";
 
 interface PageTransitionProps {
   children: React.ReactNode;
@@ -10,20 +9,15 @@ interface PageTransitionProps {
 
 const PageTransition = ({ children }: PageTransitionProps) => {
   const pathname = usePathname();
-  const isInitialMount = useRef(true);
 
-  // Skip animation on initial mount
-  if (isInitialMount.current) {
-    isInitialMount.current = false;
-    return <>{children}</>;
-  }
-
-  // Animate on subsequent pathname changes
+  // Always render the same structure (no ref branch) so server and client
+  // output identical HTML and avoid hydration mismatch. Use initial={false}
+  // so there is no initial animation state that could differ.
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={pathname}
-        initial={{ opacity: 0, y: 15 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 15 }}
         transition={{ duration: 0.35, ease: "easeInOut" }}

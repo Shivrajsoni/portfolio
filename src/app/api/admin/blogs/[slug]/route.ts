@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { getBlogBySlug } from "@/lib/blog-utils";
+import { getBlogBySlug, updateBlogFeatured } from "@/lib/blog-utils";
 import { deleteBlogPost, updateBlogPost, blogPostExists } from "@/lib/file-operations";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -126,6 +126,51 @@ ${content}`;
     });
   } catch (error) {
     console.error(`Error updating blog post ${params.slug}:`, error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH - Update only the featured flag (for admin quick-toggle)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { slug: string } }
+) {
+  try {
+    const token = request.cookies.get("adminToken")?.value || null;
+    if (!isAdminAuthenticated(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const body = await request.json();
+    const featured = typeof body.featured === "boolean" ? body.featured : undefined;
+    if (featured === undefined) {
+      return NextResponse.json(
+        { error: "Body must include featured: boolean" },
+        { status: 400 }
+      );
+    }
+    if (!blogPostExists(params.slug)) {
+      return NextResponse.json(
+        { error: `Blog post with slug "${params.slug}" not found` },
+        { status: 404 }
+      );
+    }
+    const success = await updateBlogFeatured(params.slug, featured);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Failed to update featured" },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json({
+      success: true,
+      featured,
+      message: featured ? "Blog marked as featured" : "Blog removed from featured",
+    });
+  } catch (error) {
+    console.error(`Error PATCH blog featured ${params.slug}:`, error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -38,20 +38,37 @@ interface ProfileHighlightCardProps {
 
 const HOVER_IMAGE = "/WhatsApp%20Image%202025-08-22%20at%2013.39.06%20(1).jpeg";
 
+// Theme-derived classes. Use a stable default during SSR/initial client render
+// so server and client output the same className and avoid hydration mismatch.
+const CARD_CLASSES = {
+  light: {
+    border: "border border-slate-200/90 shadow-[0_8px_30px_rgba(15,23,42,0.08)]",
+    bg: "bg-white",
+  },
+  dark: {
+    border: "border border-slate-600/50 shadow-[0_20px_60px_rgba(0,0,0,0.35)]",
+    bg: "bg-white/95",
+  },
+} as const;
+
 export default function ProfileHighlightCard({
   imageSrc = "/github_pfp.jpeg",
   imageHoverSrc = HOVER_IMAGE,
 }: ProfileHighlightCardProps) {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const isLight = resolvedTheme === "light";
-  const cardBorder = isLight
-    ? "border border-slate-200/90 shadow-[0_8px_30px_rgba(15,23,42,0.08)]"
-    : "border border-slate-600/50 shadow-[0_20px_60px_rgba(0,0,0,0.35)]";
-  const cardBg = isLight ? "bg-white" : "bg-white/95";
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Use dark as default until mounted so server and first client paint match.
+  const isLight = mounted ? resolvedTheme === "light" : false;
+  const cardBorder = isLight ? CARD_CLASSES.light.border : CARD_CLASSES.dark.border;
+  const cardBg = isLight ? CARD_CLASSES.light.bg : CARD_CLASSES.dark.bg;
 
   useEffect(() => {
     audioRef.current = new Audio("/song.mp3");
@@ -78,7 +95,7 @@ export default function ProfileHighlightCard({
   return (
     <motion.div
       layout={false}
-      initial="initial"
+      initial={false}
       animate="animate"
       variants={cardVariants}
       whileHover={{

@@ -3,9 +3,15 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Book, Briefcase, Trophy, ArrowRight } from "lucide-react";
+import { Book, Briefcase, Trophy, Star, ArrowRight } from "lucide-react";
 
 const dashboardItems = [
+  {
+    href: "/admin/featured",
+    icon: Star,
+    title: "Featured",
+    description: "Mark or unmark blogs, projects, and proof of work as featured.",
+  },
   {
     href: "/admin/blogs",
     icon: Book,

@@ -20,6 +20,8 @@ import {
   Link,
   Award,
   Megaphone,
+  CheckCircle2,
+  CircleDot,
 } from "lucide-react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
@@ -49,22 +51,36 @@ const ProofOfWorkPage = async () => {
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {allProofOfWork.map((entry) => (
+            {allProofOfWork.map((entry) => {
+              const typeIcon =
+                entry.type === "bounty" ? (
+                  <Award className="w-6 h-6 text-yellow-400" />
+                ) : entry.type === "mentions" ? (
+                  <Megaphone className="w-6 h-6 text-blue-400" />
+                ) : (
+                  <GitPullRequest className="w-6 h-6 text-green-400" />
+                );
+              return (
               <Card
                 key={entry.slug}
                 className="bg-white/5 border-white/10 text-white backdrop-blur-lg overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out flex flex-col"
               >
                 <CardHeader>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    {entry.mergeStatus === "merged" ? (
+                      <div className="flex items-center gap-1.5 text-purple-400 text-sm font-medium">
+                        <CheckCircle2 className="w-5 h-5 shrink-0" />
+                        <span>Merged</span>
+                      </div>
+                    ) : entry.mergeStatus === "open" ? (
+                      <div className="flex items-center gap-1.5 text-green-400 text-sm font-medium">
+                        <CircleDot className="w-5 h-5 shrink-0" />
+                        <span>Open</span>
+                      </div>
+                    ) : null}
+                  </div>
                   <CardTitle className="text-2xl font-bold leading-tight flex items-center gap-2">
-                    {entry.type === "oss" && (
-                      <GitPullRequest className="w-6 h-6 text-green-400" />
-                    )}
-                    {entry.type === "bounty" && (
-                      <Award className="w-6 h-6 text-yellow-400" />
-                    )}
-                    {entry.type === "mentions" && (
-                      <Megaphone className="w-6 h-6 text-blue-400" />
-                    )}
+                    {typeIcon}
                     {entry.title}
                   </CardTitle>
                   <CardDescription className="text-white/60 pt-2">
@@ -126,7 +142,8 @@ const ProofOfWorkPage = async () => {
                   )}
                 </CardFooter>
               </Card>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

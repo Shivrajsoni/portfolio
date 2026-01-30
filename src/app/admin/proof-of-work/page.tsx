@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { PlusCircle, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Star, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 // Extend the ProofOfWorkMeta type to optionally include the full content
@@ -50,6 +50,7 @@ const ProofOfWorkManagement = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [togglingFeatured, setTogglingFeatured] = useState<string | null>(null);
 
   // Function to fetch all proof of work entries
   const loadProofOfWork = async () => {
@@ -123,6 +124,29 @@ const ProofOfWorkManagement = () => {
       console.error("Error loading proof of work content:", error);
       alert("Error: Could not load proof of work content for editing.");
       resetForm();
+    }
+  };
+
+  // Toggle featured without opening edit form
+  const handleToggleFeatured = async (entry: ProofOfWorkMeta) => {
+    setTogglingFeatured(entry.slug);
+    try {
+      const res = await fetch(`/api/admin/proof-of-work/${entry.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ featured: !entry.featured }),
+      });
+      if (res.ok) {
+        await loadProofOfWork();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to update featured");
+      }
+    } catch (error) {
+      console.error("Error toggling featured:", error);
+      alert("Failed to update featured");
+    } finally {
+      setTogglingFeatured(null);
     }
   };
 
@@ -435,6 +459,19 @@ const ProofOfWorkManagement = () => {
                     )}
                   </CardContent>
                   <div className="p-6 pt-0 flex justify-end gap-2">
+                    <Button
+                      variant={entry.featured ? "default" : "outline"}
+                      size="icon"
+                      title={entry.featured ? "Remove from featured" : "Add to featured"}
+                      onClick={() => handleToggleFeatured(entry)}
+                      disabled={togglingFeatured === entry.slug}
+                    >
+                      {togglingFeatured === entry.slug ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Star className={`h-4 w-4 ${entry.featured ? "fill-current" : ""}`} />
+                      )}
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"

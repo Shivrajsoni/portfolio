@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { PlusCircle, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Star, Loader2 } from "lucide-react";
 
 // Extend the BlogMeta type to optionally include the full content
 interface BlogMeta extends BlogMetaType {
@@ -35,6 +35,7 @@ const BlogManagement = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [togglingFeatured, setTogglingFeatured] = useState<string | null>(null);
 
   // Function to fetch all blogs
   const loadBlogs = async () => {
@@ -100,6 +101,29 @@ const BlogManagement = () => {
       console.error("Error loading blog content:", error);
       alert("Error: Could not load blog content for editing.");
       resetForm();
+    }
+  };
+
+  // Toggle featured without opening edit form
+  const handleToggleFeatured = async (blog: BlogMeta) => {
+    setTogglingFeatured(blog.slug);
+    try {
+      const res = await fetch(`/api/admin/blogs/${blog.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ featured: !blog.featured }),
+      });
+      if (res.ok) {
+        await loadBlogs();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to update featured");
+      }
+    } catch (error) {
+      console.error("Error toggling featured:", error);
+      alert("Failed to update featured");
+    } finally {
+      setTogglingFeatured(null);
     }
   };
 
@@ -319,6 +343,19 @@ const BlogManagement = () => {
                     )}
                   </CardContent>
                   <div className="p-6 pt-0 flex justify-end gap-2">
+                    <Button
+                      variant={blog.featured ? "default" : "outline"}
+                      size="icon"
+                      title={blog.featured ? "Remove from featured" : "Add to featured"}
+                      onClick={() => handleToggleFeatured(blog)}
+                      disabled={togglingFeatured === blog.slug}
+                    >
+                      {togglingFeatured === blog.slug ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Star className={`h-4 w-4 ${blog.featured ? "fill-current" : ""}`} />
+                      )}
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"

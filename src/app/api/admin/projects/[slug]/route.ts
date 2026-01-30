@@ -5,6 +5,7 @@ import {
   projectPostExists,
   updateProjectPost,
   deleteProjectPost,
+  updateProjectFeatured,
 } from "@/lib/file-operations";
 
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -142,6 +143,51 @@ ${content}`;
     }
   } catch (error) {
     console.error(`Error updating project ${slug}:`, error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH - Update only the featured flag (for admin quick-toggle)
+export async function PATCH(
+  request: NextRequest,
+  { params: { slug } }: { params: { slug: string } }
+) {
+  try {
+    const token = request.cookies.get("adminToken")?.value || null;
+    if (!isAdminAuthenticated(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const body = await request.json();
+    const featured = typeof body.featured === "boolean" ? body.featured : undefined;
+    if (featured === undefined) {
+      return NextResponse.json(
+        { error: "Body must include featured: boolean" },
+        { status: 400 }
+      );
+    }
+    if (!projectPostExists(slug)) {
+      return NextResponse.json(
+        { error: `Project with slug "${slug}" not found` },
+        { status: 404 }
+      );
+    }
+    const success = updateProjectFeatured(slug, featured);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Failed to update featured" },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json({
+      success: true,
+      featured,
+      message: featured ? "Project marked as featured" : "Project removed from featured",
+    });
+  } catch (error) {
+    console.error(`Error PATCH project featured ${slug}:`, error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

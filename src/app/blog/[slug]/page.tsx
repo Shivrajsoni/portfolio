@@ -3,11 +3,12 @@ import { getAllBlogSlugs, getBlogBySlug } from "@/lib/blog-utils";
 import { Metadata } from "next";
 
 type Props = {
-  params: { slug: string }
-}
+  params: Promise<{ slug: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const blog = await getBlogBySlug(params.slug);
+  const { slug } = await params;
+  const blog = await getBlogBySlug(slug);
 
   if (!blog) {
     return {
@@ -39,8 +40,9 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-const Page = async ({ params }: { params: { slug: string } }) => {
-  const blog = await getBlogBySlug(params.slug);
+const Page = async ({ params }: { params: Promise<{ slug: string }> }) => {
+  const { slug } = await params;
+  const blog = await getBlogBySlug(slug);
 
   if (!blog) {
     return <div>Blog not found</div>;

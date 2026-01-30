@@ -147,3 +147,23 @@ export async function getBlogsByTag(tag: string): Promise<BlogMeta[]> {
   const allBlogs = await getAllBlogs();
   return allBlogs.filter((blog) => blog.tags.includes(tag));
 }
+
+// Update only the featured flag for a blog post (for admin quick-toggle)
+export async function updateBlogFeatured(
+  slug: string,
+  featured: boolean
+): Promise<boolean> {
+  try {
+    const actualBlogDirectory = getBlogDirectory();
+    const fullPath = path.join(actualBlogDirectory, `${slug}.mdx`);
+    if (!fs.existsSync(fullPath)) return false;
+    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const { data, content } = matter(fileContents);
+    const newContent = matter.stringify(content, { ...data, featured });
+    fs.writeFileSync(fullPath, newContent, "utf8");
+    return true;
+  } catch (error) {
+    console.error(`Error updating blog featured (${slug}):`, error);
+    return false;
+  }
+}

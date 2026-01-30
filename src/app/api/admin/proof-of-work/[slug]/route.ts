@@ -1,7 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { isAdminAuthenticated } from "@/lib/auth";
 import {
   getProofOfWorkBySlug,
   updateProofOfWork,
+  updateProofOfWorkFeatured,
   deleteProofOfWork,
 } from "@/lib/proof-of-work-utils";
 
@@ -49,6 +51,46 @@ export async function PUT(
     console.error("Error updating proof of work:", error);
     return NextResponse.json(
       { error: error.message || "Failed to update proof of work" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH - Update only the featured flag (for admin quick-toggle)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { slug: string } }
+) {
+  try {
+    const token = request.cookies.get("adminToken")?.value || null;
+    if (!isAdminAuthenticated(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { slug } = params;
+    const body = await request.json();
+    const featured = typeof body.featured === "boolean" ? body.featured : undefined;
+    if (featured === undefined) {
+      return NextResponse.json(
+        { error: "Body must include featured: boolean" },
+        { status: 400 }
+      );
+    }
+    const success = await updateProofOfWorkFeatured(slug, featured);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Failed to update featured or entry not found" },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json({
+      success: true,
+      featured,
+      message: featured ? "Entry marked as featured" : "Entry removed from featured",
+    });
+  } catch (error: any) {
+    console.error("Error PATCH proof of work featured:", error);
+    return NextResponse.json(
+      { error: error?.message || "Internal server error" },
       { status: 500 }
     );
   }

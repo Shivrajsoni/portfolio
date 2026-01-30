@@ -8,12 +8,14 @@ import {
   Newspaper,
   Briefcase,
   Trophy,
+  Star,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/admin/featured", icon: Star, label: "Featured" },
   { href: "/admin/blogs", icon: Newspaper, label: "Manage Blogs" },
   { href: "/admin/projects", icon: Briefcase, label: "Manage Projects" },
   { href: "/admin/proof-of-work", icon: Trophy, label: "Proof of Work" },

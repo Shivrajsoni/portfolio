@@ -15,6 +15,7 @@ type FeaturedItem = {
   title: string;
   excerpt: string;
   href: string;
+  external?: boolean;
 };
 
 interface FeaturedBarricadeSectionProps {
@@ -51,7 +52,8 @@ function buildItems(
       type: "proof",
       title: e.title,
       excerpt: e.excerpt || "",
-      href: `/proof-of-work/${e.slug}`,
+      href: e.liveLink || `/proof-of-work/${e.slug}`,
+      external: !!e.liveLink,
     }),
   );
   return items;
@@ -103,15 +105,9 @@ function FeaturedItemScroller({
           start && "animate-scroll hover:[animation-play-state:paused]",
         )}
       >
-        {items.map((item, idx) => (
-          <li
-            key={`${item.type}-${item.href}-${idx}`}
-            className="relative max-w-[260px] min-w-[240px] shrink-0"
-          >
-            <Link
-              href={item.href}
-              className="group flex flex-col gap-1.5 rounded-xl border border-border bg-card/95 backdrop-blur-sm p-3 shadow-sm transition-all hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5"
-            >
+        {items.map((item, idx) => {
+          const cardContent = (
+            <>
               <Badge
                 variant="secondary"
                 className="w-fit text-[10px] px-2 py-0"
@@ -126,9 +122,33 @@ function FeaturedItemScroller({
                   {item.excerpt}
                 </span>
               )}
-            </Link>
+            </>
+          );
+          return (
+          <li
+            key={`${item.type}-${item.href}-${idx}`}
+            className="relative max-w-[260px] min-w-[240px] shrink-0"
+          >
+            {item.external ? (
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col gap-1.5 rounded-xl border border-border bg-card/95 backdrop-blur-sm p-3 shadow-sm transition-all hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5"
+              >
+                {cardContent}
+              </a>
+            ) : (
+              <Link
+                href={item.href}
+                className="group flex flex-col gap-1.5 rounded-xl border border-border bg-card/95 backdrop-blur-sm p-3 shadow-sm transition-all hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5"
+              >
+                {cardContent}
+              </Link>
+            )}
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );

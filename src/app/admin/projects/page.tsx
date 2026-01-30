@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { PlusCircle, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Star, Loader2 } from "lucide-react";
 
 // Extend the ProjectMeta type to optionally include the full content
 interface ProjectMeta extends ProjectMetaType {
@@ -39,6 +39,7 @@ const ProjectManagement = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [togglingFeatured, setTogglingFeatured] = useState<string | null>(null);
 
   // Function to fetch all projects
   const loadProjects = async () => {
@@ -120,6 +121,29 @@ const ProjectManagement = () => {
       console.error("Error loading project content:", error);
       alert("Error: Could not load project content for editing.");
       resetForm(); // Reset form on error
+    }
+  };
+
+  // Toggle featured without opening edit form
+  const handleToggleFeatured = async (project: ProjectMeta) => {
+    setTogglingFeatured(project.slug);
+    try {
+      const res = await fetch(`/api/admin/projects/${project.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ featured: !project.featured }),
+      });
+      if (res.ok) {
+        await loadProjects();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to update featured");
+      }
+    } catch (error) {
+      console.error("Error toggling featured:", error);
+      alert("Failed to update featured");
+    } finally {
+      setTogglingFeatured(null);
     }
   };
 
@@ -356,6 +380,19 @@ const ProjectManagement = () => {
                     )}
                   </CardContent>
                   <div className="p-6 pt-0 flex justify-end gap-2">
+                    <Button
+                      variant={project.featured ? "default" : "outline"}
+                      size="icon"
+                      title={project.featured ? "Remove from featured" : "Add to featured"}
+                      onClick={() => handleToggleFeatured(project)}
+                      disabled={togglingFeatured === project.slug}
+                    >
+                      {togglingFeatured === project.slug ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Star className={`h-4 w-4 ${project.featured ? "fill-current" : ""}`} />
+                      )}
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"

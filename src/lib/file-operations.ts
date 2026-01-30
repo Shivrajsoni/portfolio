@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import matter from "gray-matter";
 
 const blogDirectory = path.join(process.cwd(), "src/content/blog");
 const projectDirectory = path.join(process.cwd(), "src/content/projects");
@@ -198,4 +199,18 @@ export function getProjectRawContent(slug: string): string | null {
         console.error(`Error reading raw content for project ${slug}:`, error);
         return null;
     }
+}
+
+// Update only the featured flag for a project post (for admin quick-toggle)
+export function updateProjectFeatured(slug: string, featured: boolean): boolean {
+  try {
+    const raw = getProjectRawContent(slug);
+    if (raw === null) return false;
+    const { data, content } = matter(raw);
+    const newContent = matter.stringify(content, { ...data, featured });
+    return updateProjectPost(slug, newContent);
+  } catch (error) {
+    console.error(`Error updating project featured (${slug}):`, error);
+    return false;
+  }
 }
