@@ -1,0 +1,79 @@
+---
+title: "DNS Resolver"
+date: "2026-01-30"
+excerpt: "A small DNS resolver that builds DNS queries, decodes answers, follows CNAME chains, and caches results using TTL."
+description: "A beginner-friendly DNS resolver project: send DNS queries, parse replies, and cache records using TTL."
+tags:
+  - Rust
+  - Networking
+  - DNS
+author: "Shivraj Soni"
+featured: false
+liveLink: "https://github.com/Shivrajsoni/dns-resolver"
+---
+
+# DNS Resolver
+
+Most of the time, DNS “just works”. But underneath, it’s a very real protocol: you send bytes that mean *“who has example.com?”* and you receive bytes that mean *“here is the answer”*.
+
+This project is a small DNS resolver you can learn from and extend. The goal is not to be a full production DNS server, but to understand the core ideas of the protocol end-to-end.
+
+---
+
+## What it does
+
+1. Takes a domain name (like `example.com`)
+2. Creates a DNS query (a request packet)
+3. Sends the query to an upstream DNS server
+4. Receives the response packet
+5. Parses the response into useful records (like `A` records)
+6. If the answer uses `CNAME`, it follows the chain until it reaches the final record
+7. Caches results using the TTL from the response (so repeated lookups are faster)
+
+---
+
+## The approach (simple mental model)
+
+Think of DNS as 3 layers:
+
+- **Packet building**: turn “what I want to look up” into bytes
+- **Packet parsing**: turn “what I received” back into structured answers
+- **Logic**: follow CNAME, handle errors, and cache
+
+---
+
+## Core principles
+
+- **DNS messages are binary**: you work with bytes, offsets, and lengths
+- **Names can be compressed**: part of the packet can point to earlier text using pointers
+- **Responses have a transaction ID**: use it to match the response to your request
+- **TTL matters**: cache until the TTL expires
+
+---
+
+## How you can build it (high level)
+
+If you were building this from scratch, the steps are roughly:
+
+1. Create a DNS header (id, flags, question count, answer count)
+2. Encode the QNAME (split labels like `example` + `com`)
+3. Specify QTYPE (e.g. `A`) and QCLASS (usually `IN`)
+4. Send the packet (commonly over UDP)
+5. Parse the header and then parse the Question + Answer sections
+6. Decode resource records (and handle name compression)
+7. Store answers in a cache with an expiry time based on TTL
+
+---
+
+## Why it’s useful to learn
+
+DNS is a great “systems” project:
+
+- you practice working with network packets
+- you learn how parsers deal with binary data
+- you see how protocols handle real-world cases like CNAME and caching
+
+If you want, you can extend it by adding more record types (like `AAAA`), improving timeouts, or making the cache smarter.
+
+---
+

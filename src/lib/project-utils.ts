@@ -70,16 +70,31 @@ export async function getAllProjects(): Promise<ProjectMeta[]> {
         const fileContents = fs.readFileSync(fullPath, "utf8");
         const { data, content } = matter(fileContents);
 
+        const computedDescription =
+          data.description ||
+          data.excerpt ||
+          content.slice(0, 150) + "...";
+
+        const computedExcerpt =
+          data.excerpt || content.slice(0, 150) + "...";
+
+        const isFeatured = !!data.featured;
+
         return {
           slug,
           title: data.title || "Untitled",
           date: data.date || new Date().toISOString().split("T")[0],
-          excerpt: data.excerpt || content.slice(0, 150) + "...",
+          // UI cards expect both description + excerpt.
+          description: computedDescription,
+          excerpt: computedExcerpt,
           readTime: calculateReadTime(content),
           tags: data.tags || [],
           author: data.author,
-          featured: data.featured || false,
+          featured: isFeatured,
+          isFeatured,
           liveLink: data.liveLink,
+          githubLink: data.githubLink,
+          pagePreviewLink: data.pagePreviewLink,
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());

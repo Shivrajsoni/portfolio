@@ -8,6 +8,9 @@ interface AnimatedGradientBackgroundProps {
   className?: string;
   children?: React.ReactNode;
   intensity?: "subtle" | "medium" | "strong";
+  // Keep existing behavior (always dark) by default so current pages don't change.
+  background?: "dark" | "auto";
+  centered?: boolean;
 }
 
 interface Beam {
@@ -39,21 +42,47 @@ function createBeam(width: number, height: number): Beam {
   };
 }
 
+const OPACITY_MAP = {
+  subtle: 0.7,
+  medium: 0.85,
+  strong: 1,
+} as const;
+
+const CONFIG_BY_INTENSITY = {
+  subtle: {
+    beamMultiplier: 1.15,
+    // Lower blur to reduce GPU load.
+    blurPx: 18,
+    // Fewer gradient stops (solid beams) below are cheaper.
+    useGradient: false,
+    // Render less frequently to cut CPU/GPU work.
+    targetFps: 30,
+  },
+  medium: {
+    beamMultiplier: 1.35,
+    blurPx: 26,
+    useGradient: true,
+    targetFps: 40,
+  },
+  strong: {
+    beamMultiplier: 1.55,
+    blurPx: 35,
+    useGradient: true,
+    targetFps: 50,
+  },
+} as const;
+
 export default function BeamsBackground({
   className,
   intensity = "strong",
   children,
+  background = "dark",
+  centered = true,
 }: AnimatedGradientBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const beamsRef = useRef<Beam[]>([]);
   const animationFrameRef = useRef<number>(0);
-  const MINIMUM_BEAMS = 20;
-
-  const opacityMap = {
-    subtle: 0.7,
-    medium: 0.85,
-    strong: 1,
-  };
+  const lastRenderTimeRef = useRef<number>(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -62,6 +91,8 @@ export default function BeamsBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const intensityConfig = CONFIG_BY_INTENSITY[intensity];
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     const updateCanvasSize = () => {
       const dpr = window.devicePixelRatio || 1;
       canvas.width = window.innerWidth * dpr;
@@ -70,7 +101,9 @@ export default function BeamsBackground({
       canvas.style.height = `${window.innerHeight}px`;
       ctx.scale(dpr, dpr);
 
-      const totalBeams = MINIMUM_BEAMS * 1.5;
+      // Keep beams bounded to reduce rendering cost.
+      const baseBeams = intensity === "subtle" ? 14 : intensity === "medium" ? 20 : 24;
+      const totalBeams = baseBeams * intensityConfig.beamMultiplier;
       beamsRef.current = Array.from({ length: totalBeams }, () =>
         createBeam(canvas.width, canvas.height)
       );
@@ -104,40 +137,47 @@ export default function BeamsBackground({
       const pulsingOpacity =
         beam.opacity *
         (0.8 + Math.sin(beam.pulse) * 0.2) *
-        opacityMap[intensity];
+        OPACITY_MAP[intensity];
+      if (!intensityConfig.useGradient) {
+        ctx.fillStyle = `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`;
+        ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length);
+      } else {
+        const gradient = ctx.createLinearGradient(0, 0, 0, beam.length);
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, beam.length);
+        // Enhanced gradient with multiple color stops
+        gradient.addColorStop(0, `hsla(${beam.hue}, 85%, 65%, 0)`);
+        gradient.addColorStop(
+          0.1,
+          `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`
+        );
+        gradient.addColorStop(0.4, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`);
+        gradient.addColorStop(0.6, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`);
+        gradient.addColorStop(
+          0.9,
+          `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`
+        );
+        gradient.addColorStop(1, `hsla(${beam.hue}, 85%, 65%, 0)`);
 
-      // Enhanced gradient with multiple color stops
-      gradient.addColorStop(0, `hsla(${beam.hue}, 85%, 65%, 0)`);
-      gradient.addColorStop(
-        0.1,
-        `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`
-      );
-      gradient.addColorStop(
-        0.4,
-        `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`
-      );
-      gradient.addColorStop(
-        0.6,
-        `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`
-      );
-      gradient.addColorStop(
-        0.9,
-        `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`
-      );
-      gradient.addColorStop(1, `hsla(${beam.hue}, 85%, 65%, 0)`);
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length);
+      }
       ctx.restore();
     }
 
     function animate() {
       if (!canvas || !ctx) return;
 
+      // Throttle rendering to reduce GPU/CPU load.
+      const targetFrameMs = 1000 / intensityConfig.targetFps;
+      const now = performance.now();
+      if (now - lastRenderTimeRef.current < targetFrameMs) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastRenderTimeRef.current = now;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.filter = "blur(35px)";
+      ctx.filter = `blur(${intensityConfig.blurPx}px)`;
 
       const totalBeams = beamsRef.current.length;
       beamsRef.current.forEach((beam, index) => {
@@ -155,7 +195,19 @@ export default function BeamsBackground({
       animationFrameRef.current = requestAnimationFrame(animate);
     }
 
-    animate();
+    // `subtle` is used on content-heavy pages; keep it static to avoid lag.
+    const shouldAnimate = !prefersReducedMotion && intensity !== "subtle";
+
+    if (!shouldAnimate) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.filter = `blur(${intensityConfig.blurPx}px)`;
+      beamsRef.current.forEach((beam) => {
+        drawBeam(ctx, beam);
+      });
+      // Single-frame render (either reduced motion or `subtle` mode).
+    } else {
+      animate();
+    }
 
     return () => {
       window.removeEventListener("resize", updateCanvasSize);
@@ -168,35 +220,51 @@ export default function BeamsBackground({
   return (
     <div
       className={cn(
-        "relative min-h-[100vh] w-full overflow-hidden bg-neutral-950",
+        "relative min-h-[100vh] w-full overflow-hidden",
+        background === "dark" ? "bg-neutral-950" : "bg-neutral-50 dark:bg-neutral-950",
         className
       )}
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0"
-        style={{ filter: "blur(15px)" }}
+        aria-hidden
+        className={cn(
+          "absolute inset-0 pointer-events-none",
+          intensity === "subtle" ? "blur-[8px]" : "blur-[15px]"
+        )}
       />
 
-      <motion.div
-        className="absolute inset-0 bg-neutral-950/5"
-        initial={false}
-        animate={{
-          opacity: [0.05, 0.15, 0.05],
-        }}
-        transition={{
-          duration: 10,
-          ease: "easeInOut",
-          repeat: Number.POSITIVE_INFINITY,
-        }}
-        style={{
-          backdropFilter: "blur(50px)",
-        }}
-      />
+      {intensity === "subtle" ? (
+        <div
+          className={cn(
+            "absolute inset-0 pointer-events-none -z-10",
+            background === "dark" ? "bg-neutral-950/20" : "bg-neutral-900/5 dark:bg-neutral-950/20"
+          )}
+        />
+      ) : (
+        <motion.div
+          className={cn(
+            "absolute inset-0 pointer-events-none -z-10",
+            background === "dark" ? "bg-neutral-950/5" : "bg-neutral-900/5 dark:bg-neutral-950/5",
+            intensity === "medium" ? "backdrop-blur-[35px]" : "backdrop-blur-[50px]"
+          )}
+          initial={false}
+          animate={{
+            opacity: [0.05, 0.15, 0.05],
+          }}
+          transition={{
+            duration: 10,
+            ease: "easeInOut",
+            repeat: Number.POSITIVE_INFINITY,
+          }}
+        />
+      )}
 
-      <div className="relative z-10 flex h-full w-full items-center justify-center">
-        {children}
-      </div>
+      {centered ? (
+        <div className="relative z-10 flex h-full w-full items-center justify-center">{children}</div>
+      ) : (
+        <div className="relative z-10 w-full">{children}</div>
+      )}
     </div>
   );
 }

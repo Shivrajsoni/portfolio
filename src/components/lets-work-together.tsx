@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ export default function LetsWorkTogether() {
     margin: "0px 0px 100px 0px",
   });
   const { resolvedTheme } = useTheme();
+  const prefersReducedMotion = useReducedMotion();
   // Start fully off the right edge of the viewport so it feels like "from outside the page"
   const [slideDistance, setSlideDistance] = useState(1200);
   useEffect(() => {
@@ -95,19 +96,25 @@ export default function LetsWorkTogether() {
       className="relative w-full min-h-[320px] overflow-visible max-w-full"
     >
       <motion.section
-        initial={{ opacity: 0, x: slideDistance, scale: 0.96 }}
-        animate={
-          isLanded
+        initial={
+          prefersReducedMotion
             ? { opacity: 1, x: 0, scale: 1 }
             : { opacity: 0, x: slideDistance, scale: 0.96 }
         }
+        animate={
+          prefersReducedMotion
+            ? { opacity: 1, x: 0, scale: 1 }
+            : isLanded
+              ? { opacity: 1, x: 0, scale: 1 }
+              : { opacity: 0, x: slideDistance, scale: 0.96 }
+        }
         transition={{
-          duration: 1.35,
+          duration: prefersReducedMotion ? 0 : 1.35,
           ease: [0.19, 1, 0.22, 1],
         }}
         className="relative w-full max-w-full"
         style={{
-          willChange: isLanded ? "auto" : "transform",
+          willChange: prefersReducedMotion ? "auto" : isLanded ? "auto" : "transform",
           transformOrigin: "right center",
         }}
       >

@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { motion } from "framer-motion";
-import { Flame, Linkedin, Github, Twitter, Code2 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Flame, Linkedin, Github, X, Code2 } from "lucide-react";
 
 const PROFILE_LINKS = {
   linkedin: "https://www.linkedin.com/in/shivraj-soni-34572b226/",
@@ -56,6 +56,7 @@ export default function ProfileHighlightCard({
   imageHoverSrc = HOVER_IMAGE,
 }: ProfileHighlightCardProps) {
   const { resolvedTheme } = useTheme();
+  const prefersReducedMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -91,6 +92,21 @@ export default function ProfileHighlightCard({
   };
 
   const hoverImage = imageHoverSrc ?? imageSrc;
+  const whileHover =
+    prefersReducedMotion
+      ? undefined
+      : {
+          y: -6,
+          scale: 1.01,
+          boxShadow: isLight
+            ? "0 20px 50px rgba(15,23,42,0.12)"
+            : "0 26px 70px rgba(0,0,0,0.4)",
+          transition: {
+            type: "spring" as const,
+            stiffness: 220,
+            damping: 18,
+          },
+        };
 
   return (
     <motion.div
@@ -98,14 +114,7 @@ export default function ProfileHighlightCard({
       initial={false}
       animate="animate"
       variants={cardVariants}
-      whileHover={{
-        y: -6,
-        scale: 1.01,
-        boxShadow: isLight
-          ? "0 20px 50px rgba(15,23,42,0.12)"
-          : "0 26px 70px rgba(0,0,0,0.4)",
-        transition: { type: "spring", stiffness: 220, damping: 18 },
-      }}
+      whileHover={whileHover}
       className={`relative flex min-h-[520px] w-[360px] shrink-0 flex-col overflow-hidden rounded-[40px] px-6 pb-8 pt-5 ${cardBg} ${cardBorder}`}
       style={{ transformOrigin: "center top" }}
     >
@@ -129,13 +138,19 @@ export default function ProfileHighlightCard({
         {/* Portrait block - flip on hover */}
         <div
           className="relative mx-auto mb-5 mt-1 h-64 w-full max-w-[260px] cursor-pointer overflow-hidden rounded-[28px] bg-gradient-to-br from-[#f97316] via-[#ea580c] to-[#c2410c] [perspective:800px]"
-          onMouseEnter={() => setIsFlipped(true)}
-          onMouseLeave={() => setIsFlipped(false)}
+          onMouseEnter={
+            prefersReducedMotion ? undefined : () => setIsFlipped(true)
+          }
+          onMouseLeave={
+            prefersReducedMotion ? undefined : () => setIsFlipped(false)
+          }
           role="img"
           aria-label="Profile photo"
         >
           <div
-            className="relative h-full w-full transition-transform duration-500 ease-in-out"
+            className={`relative h-full w-full ${
+              prefersReducedMotion ? "" : "transition-transform duration-500 ease-in-out"
+            }`}
             style={{
               transformStyle: "preserve-3d",
               transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
@@ -174,7 +189,7 @@ export default function ProfileHighlightCard({
 
         {/* Name */}
         <div className="mb-10 text-center">
-          <h2 className="text-xl font-black leading-tight tracking-tight text-black">
+          <h2 className="text-xl font-black leading-tight tracking-tight text-foreground dark:text-black">
             Shivraj Soni
           </h2>
         </div>
@@ -210,7 +225,7 @@ export default function ProfileHighlightCard({
         </div>
 
         {/* Description */}
-        <p className="mb-6 text-center text-sm font-medium leading-snug text-[#6E6E6E] flex-1">
+        <p className="mb-6 text-center text-sm font-medium leading-snug text-muted-foreground dark:text-[#6E6E6E] flex-1">
           A Software Engineer who has developed countless innovative solutions.
         </p>
 
@@ -238,10 +253,10 @@ export default function ProfileHighlightCard({
             href={PROFILE_LINKS.twitter}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="X (Twitter)"
+            aria-label="X"
             className="transition-transform duration-200 hover:scale-110"
           >
-            <Twitter className="h-6 w-6" />
+            <X className="h-6 w-6" />
           </Link>
           <Link
             href={PROFILE_LINKS.leetcode}

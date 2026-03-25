@@ -55,8 +55,8 @@ const ProjectsPage = () => {
   };
 
   return (
-    <BeamsBackground intensity="subtle">
-      <div className="container mx-auto py-12 px-4 relative z-10">
+    <BeamsBackground intensity="subtle" background="auto">
+      <div className="mx-auto w-full max-w-6xl px-6 py-12 sm:px-8 relative z-10">
         <Breadcrumb className="mb-8">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -68,7 +68,7 @@ const ProjectsPage = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <h1 className="text-5xl font-bold text-center mb-16 text-white tracking-tighter">
+        <h1 className="text-5xl font-bold text-center mb-16 text-foreground tracking-tighter">
           Projects
         </h1>
 
@@ -79,7 +79,11 @@ const ProjectsPage = () => {
               variant={selectedTag === tag ? "default" : "ghost"}
               size="sm"
               onClick={() => filterProjects(tag)}
-              className="rounded-full bg-white/10 text-white/80 border-none hover:bg-white/20"
+              className={
+                selectedTag === tag
+                  ? "rounded-full"
+                  : "rounded-full bg-primary/10 text-foreground opacity-80 border-none hover:bg-primary/20"
+              }
             >
               {tag}
             </Button>
@@ -87,7 +91,7 @@ const ProjectsPage = () => {
         </div>
 
         {isLoading ? (
-          <p className="text-center text-white/70">Loading projects...</p>
+          <p className="text-center text-muted-foreground">Loading projects...</p>
         ) : (
           <ProjectsGrid projects={filteredProjects} />
         )}

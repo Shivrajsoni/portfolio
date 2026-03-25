@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useScroll, motion } from "framer-motion";
+import { useScroll, motion, useReducedMotion } from "framer-motion";
 import BackgroundCircles from "@/components/background-circles-client";
 import ProfileHighlightCard from "@/components/profile-highlight-card";
 import FeaturedBarricadeSection from "@/components/featured-barricade-section";
@@ -26,6 +26,7 @@ export default function HeroAndProfileWrapper({
   featuredProofOfWork = [],
 }: HeroAndProfileWrapperProps) {
   const heroRef = useRef<HTMLDivElement | null>(null);
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -56,16 +57,16 @@ export default function HeroAndProfileWrapper({
       <section className="relative z-10 min-h-[200vh] pl-0 pt-16 pb-12 md:pl-1 lg:pl-2 overflow-visible">
         <div className="mx-auto flex max-w-5xl flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12 overflow-visible">
           {/* Left column always same width so right column never shifts — card fades in/out in place; LetsWorkTogether always slides from viewport right */}
-          <div className="sticky top-[20%] left-0 w-[360px] min-w-[360px] shrink-0 self-start overflow-visible h-fit pointer-events-none">
+          <div className="relative lg:sticky lg:top-[20%] lg:left-0 w-full max-w-[360px] lg:w-[360px] lg:min-w-[360px] shrink-0 self-start overflow-visible h-fit pointer-events-none">
             <div className="pointer-events-auto w-full">
               <motion.div
                 initial={false}
                 animate={{
                   opacity: showCard ? 1 : 0,
-                  x: showCard ? 0 : -32,
+                  x: prefersReducedMotion ? 0 : showCard ? 0 : -32,
                 }}
                 transition={{
-                  duration: 0.55,
+                  duration: prefersReducedMotion ? 0 : 0.55,
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="w-full"

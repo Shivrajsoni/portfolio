@@ -1,0 +1,36 @@
+---
+title: 'Stratum: Use RwLock for connection_mapping to avoid blocking RPC'
+type: oss
+date: '2026-03-25'
+excerpt: Thread-Safe Connection Mapping with RwLock
+tags:
+  - Rust
+liveLink: 'https://github.com/braidpool/braidpool/pull/405'
+organization: Braidpool
+hardnessLevel: Easy
+featured: false
+mergeStatus: null
+---
+ ## Thread-Safe Connection Mapping with RwLock
+
+Wrap `connection_mapping` in `Arc<RwLock<ConnectionMapping>>` so that:
+- `getminerinfo` and the `Notifier` use **read locks**, preventing Stratum from being blocked when:
+  - miners are added/removed  
+  - job notifications are sent  
+
+- Stratum add/remove operations use **write locks**, keeping the critical sections short.
+
+---
+
+## Updates
+
+### main.rs
+- Create `connection_mapping` using `RwLock`.
+
+### stratum.rs
+- Server and Notifier now use **read/write locks**.
+- Tests updated accordingly.
+
+### rpc_server.rs
+- `get_miner_info` now uses `read().await`.
+- `run_rpc_server` and tests updated to use `RwLock` for the mapping.

@@ -1,0 +1,62 @@
+---
+title: "Bittorrent"
+date: "2026-01-30"
+excerpt: "A Rust BitTorrent client implementing the peer wire protocol and piece-based downloading with hash verification."
+description: "Piece-based BitTorrent downloading in Rust: talk to peers, request blocks, verify hashes, and assemble the file."
+tags:
+  - Rust
+  - Networking
+  - BitTorrent
+author: "Shivraj Soni"
+featured: false
+liveLink: "https://github.com/Shivrajsoni/Bittorrent"
+---
+
+# Bittorrent
+
+BitTorrent is one of the classic peer-to-peer protocols: instead of downloading a whole file from one server, you download *pieces* from multiple peers.
+
+This project is a Rust BitTorrent client. The main learning goal is the peer wire protocol and the piece downloading flow: request blocks, receive data, verify hashes, and keep going until the file is complete.
+
+---
+
+## What it focuses on
+
+- **Peer wire protocol basics**
+- **Piece and block downloading**
+- **Verifying data with hashes** (so you know the received bytes are correct)
+- **Managing peer sessions** (keep connections, handle messages)
+
+---
+
+## The big idea (simple)
+
+1. You start with torrent metadata (how many pieces, what hashes to expect)
+2. You learn which peers are available
+3. You connect to peers
+4. You ask for blocks from pieces
+5. You receive blocks and assemble them into pieces
+6. When a piece is complete, you verify it matches the expected hash
+7. When all pieces are verified, you have the full file
+
+---
+
+## Data flow (beginner-friendly)
+
+BitTorrent splits the file into **pieces**. Each piece can be downloaded in smaller **blocks** so the download can pipeline multiple requests.
+
+Once blocks are received, they’re combined into the original piece byte sequence and hash-checked.
+
+---
+
+## Extensions (if you want to go further)
+
+Once the core download loop works, you can build nicer features like:
+
+- better peer selection
+- resume/checkpoint support
+- endgame mode (handle the “last blocks” more intelligently)
+- UI improvements or monitoring
+
+---
+

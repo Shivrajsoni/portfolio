@@ -1,0 +1,187 @@
+---
+title: "How to Create a Simple DNS Resolver"
+date: "2026-01-30"
+excerpt: "A beginner-friendly path to understanding and building a DNS resolver: from DNS packets to parsing answers and caching."
+tags:
+  - DNS
+  - Technical
+  - Rust
+  - Networking
+author: "Shivraj Soni"
+featured: false
+---
+
+# How to Create a Simple DNS Resolver
+
+DNS is the system that turns **names** (like `example.com`) into **numbers** (like IP addresses).
+
+In this post, we’ll walk through the _core approach_ to build a simple DNS resolver. No magic. Just a clear path from “bytes in” to “answers out”.
+
+---
+
+## Step 1: Understand the goal (simple)
+
+A DNS resolver does this:
+
+1. You give it a domain name.
+2. It asks an upstream DNS server: “What is the answer?”
+3. It receives a response packet.
+4. It parses the packet and returns useful records (like `A` records for IPv4).
+
+That’s it for the basic version.
+
+---
+
+## Step 2: DNS is packets (binary, not strings)
+
+DNS messages are not text. They are **binary packets**.
+
+So your job is basically:
+
+- create bytes that represent a DNS query
+- parse bytes that represent a DNS response
+
+Think of it like writing a “decoder ring” for DNS.
+
+---
+
+## Step 3: Build a DNS query
+
+A DNS query has a header and a question section.
+
+At a high level, you choose:
+
+- a **transaction id** (an integer you generate)
+- the **question**: name + record type (`A`, `AAAA`, etc.)
+
+Then you encode that into bytes.
+
+### QNAME: how domain names become bytes
+
+Domain names like `example.com` aren’t stored as plain text in DNS packets.
+
+Instead, DNS splits them into labels:
+
+- `example` (7 letters)
+- `com` (3 letters)
+
+And each label is stored with its length.
+
+---
+
+## Step 4: Send the query (UDP is common)
+
+Most simple DNS resolvers send queries using **UDP**.
+
+High level:
+
+- send the packet to an upstream server (for example: `8.8.8.8`)
+- wait for a response
+- handle timeouts
+
+In Rust, it often looks like:
+
+```rust
+// pseudo-code
+// 1) bind a UDP socket
+// 2) send query bytes to upstream
+// 3) read response bytes into a buffer
+```
+
+---
+
+## Step 5: Parse the response
+
+When you receive bytes, you parse them in this order:
+
+1. **Header**
+2. **Question** (you can use it to sanity-check)
+3. **Answer/Authority/Additional sections**
+
+Each answer is a **Resource Record**:
+
+- it has a name
+- a type (`A`, `AAAA`, `CNAME`, ...)
+- a TTL (time to live)
+- and the data for that record
+
+For `A` records, the data is usually the IPv4 address.
+
+---
+
+## Step 6: Handle CNAME chains (common real-world case)
+
+Sometimes you don’t get an `A` record right away.
+
+You might get a `CNAME` saying:
+
+> “This name is an alias of another name”
+
+So your resolver needs to:
+
+- detect `CNAME`
+- follow the alias target
+- query again (or continue following what the packet contains)
+
+Eventually you reach a final record (`A` or `AAAA`).
+
+---
+
+## Step 7: Cache using TTL (the “real resolver” part)
+
+Every DNS record includes a **TTL**.
+
+TTL answers: _“How long is it safe to reuse this answer?”_
+
+So your resolver can store results like:
+
+- query key: `(name, record type)`
+- value: parsed answer
+- expiry time: `now + TTL`
+
+Next time, if the cached entry is not expired, you skip the network round trip.
+
+---
+
+## Technicalites (the stuff that makes it work)
+
+Here are a few tricky details that show up in DNS:
+
+- **Name compression**  
+  DNS can store a name using pointers to earlier parts of the packet. You need to decode those pointers.
+- **Transaction id matching**  
+  Make sure the response you got is for the query you sent.
+- **Lengths and bounds**  
+  Always validate offsets so you don’t parse past the buffer.
+- **Timeouts and errors**  
+  Real networks fail. Your resolver should handle that gracefully.
+
+---
+
+## Testing like a newbie
+
+Use a trusted tool to compare your results.
+
+Try:
+
+- `dig example.com A @8.8.8.8`
+- `dig google.com A @8.8.8.8`
+
+Then run your resolver with the same inputs and compare:
+
+- the number of answers
+- the IP addresses
+- whether TTL parsing matches
+
+---
+
+## Next steps (where you can improve)
+
+If you want to go beyond the first working version:
+
+- add support for more record types (`AAAA`, `MX`, ...)
+- improve caching (and cache negative results)
+- handle larger responses safely
+- add better timeouts + retries
+
+---

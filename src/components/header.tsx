@@ -8,7 +8,7 @@ import { GlassMenuEffect } from "@/components/ui/glass-menu-effect";
 import {
   Menu,
   Github,
-  Twitter,
+  X,
   Linkedin,
   Sun,
   Moon,
@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 const GITHUB_USERNAME = "Shivrajsoni"; // Change if needed
-const TWITTER_URL = "https://x.com/_callmeXavier_"; // Add your handle
+const X_URL = "https://x.com/_callmeXavier_"; // Add your handle
 const LINKEDIN_URL = "https://www.linkedin.com/in/shivraj-soni-34572b226/"; // Add your handle
 const GITHUB_URL = `https://github.com/${GITHUB_USERNAME}`;
 const GITHUB_PFP = `https://github.com/${GITHUB_USERNAME}.png`;
@@ -29,9 +29,9 @@ const socialLinks = [
     icon: Github,
   },
   {
-    href: TWITTER_URL,
-    label: "Twitter",
-    icon: Twitter,
+    href: X_URL,
+    label: "X",
+    icon: X,
   },
   {
     href: LINKEDIN_URL,
@@ -66,7 +66,7 @@ const Header = () => {
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
               className={`flex items-center justify-between 
                 shadow-custom-light dark:shadow-custom-dark
-                w-full sm:min-w-[800px] sm:max-w-[1200px]
+                w-full sm:max-w-[1200px] sm:mx-auto
                 rounded-b-[28px]
                 px-4 py-2.5
                 relative
