@@ -12,8 +12,6 @@ import {
   Linkedin,
   Sun,
   Moon,
-  PartyPopper,
-  ArrowUpRight,
 } from "lucide-react";
 
 const GITHUB_USERNAME = "Shivrajsoni"; // Change if needed

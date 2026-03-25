@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import type { ProofOfWorkMeta as ProofOfWorkMetaType } from "@/lib/proof-of-work-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,16 +15,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusCircle, Edit, Trash2, Star, Loader2 } from "lucide-react";
-import Link from "next/link";
 
 // Extend the ProofOfWorkMeta type to optionally include the full content
 interface ProofOfWorkMeta extends ProofOfWorkMetaType {
   content?: string;
 }
 
-const proofOfWorkTypes = ["oss", "bounty", "mentions"] as const;
-
-type ProofOfWorkType = (typeof proofOfWorkTypes)[number];
+type ProofOfWorkType = "oss" | "bounty" | "mentions";
 
 const ProofOfWorkManagement = () => {
   const [proofOfWorkEntries, setProofOfWorkEntries] = useState<
@@ -33,10 +30,6 @@ const ProofOfWorkManagement = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProofOfWork, setEditingProofOfWork] =
     useState<ProofOfWorkMeta | null>(null);
-  type Type = {
-    oss: string;
-    bounty: string;
-  };
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",

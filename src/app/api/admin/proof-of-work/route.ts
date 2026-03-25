@@ -2,17 +2,18 @@ import { NextResponse } from "next/server";
 import {
   getAllProofOfWork,
   createProofOfWork,
-  getProofOfWorkBySlug,
 } from "@/lib/proof-of-work-utils";
 
 export async function GET() {
   try {
     const proofOfWork = await getAllProofOfWork();
     return NextResponse.json({ proofOfWork });
-  } catch (error: any) {
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch proof of work";
     console.error("Error fetching proof of work:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch proof of work" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -40,10 +41,12 @@ export async function POST(request: Request) {
 
     const newProofOfWork = await createProofOfWork(data);
     return NextResponse.json(newProofOfWork, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to create proof of work";
     console.error("Error creating proof of work:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create proof of work" },
+      { error: message },
       { status: 500 }
     );
   }

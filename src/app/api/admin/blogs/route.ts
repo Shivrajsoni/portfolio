@@ -3,7 +3,6 @@ import { isAdminAuthenticated } from "@/lib/auth";
 import {
   createBlogPost,
   blogPostExists,
-  updateBlogPost,
   deleteBlogPost,
 } from "@/lib/file-operations";
 import { getAllBlogs } from "@/lib/blog-utils";

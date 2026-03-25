@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 // 2x2 Bayer matrix (normalized 0–1)
@@ -93,9 +93,9 @@ export function DitherShader({
         for (let y = 0; y < h; y++) {
           for (let x = 0; x < w; x++) {
             const i = (y * w + x) * 4;
-            let r = data[i] / 255;
-            let g = data[i + 1] / 255;
-            let b = data[i + 2] / 255;
+            const r = data[i] / 255;
+            const g = data[i + 1] / 255;
+            const b = data[i + 2] / 255;
 
             const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
             const level = colorMode === "grayscale" ? luminance : (r + g + b) / 3;

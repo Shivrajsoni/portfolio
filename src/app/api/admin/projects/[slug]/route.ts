@@ -119,7 +119,7 @@ excerpt: "${excerpt.replace(/"/g, '\\"')}"
 date: "${new Date().toISOString().split("T")[0]}"
 tags: [${tags
       .split(",")
-      //@ts-ignore
+      //@ts-expect-error - tags is validated at runtime, but TS can't infer its type here
       .map((tag) => JSON.stringify(tag.trim()))
       .join(", ")}]
 author: "${author}"
@@ -135,7 +135,7 @@ ${content}`;
         { message: "Project updated successfully", slug },
         { status: 200 }
       );
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: "Failed to update project post" },
         { status: 500 }
@@ -230,7 +230,7 @@ export async function DELETE(
         { message: "Project deleted successfully" },
         { status: 200 }
       );
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: "Failed to delete project post" },
         { status: 500 }

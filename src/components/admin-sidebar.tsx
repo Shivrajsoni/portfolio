@@ -33,7 +33,6 @@ export default function AdminSidebar() {
       initial={false}
       animate={{ width: isCollapsed ? 80 : 256 }}
       transition={{ duration: 0.3 }}
-      //@ts-ignore
       className="relative bg-card border-r border-border min-h-screen p-4 flex flex-col"
     >
       <div className="flex items-center justify-between mb-8">
@@ -44,7 +43,6 @@ export default function AdminSidebar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              //@ts-ignore
               className="text-xl font-bold"
             >
               Admin Panel

@@ -20,10 +20,14 @@ export async function GET(
     }
 
     return NextResponse.json({ proofOfWork });
-  } catch (error: any) {
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to fetch proof of work";
     console.error("Error fetching proof of work by slug:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch proof of work" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -47,10 +51,12 @@ export async function PUT(
 
     const updatedProofOfWork = await updateProofOfWork(slug, data);
     return NextResponse.json(updatedProofOfWork);
-  } catch (error: any) {
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update proof of work";
     console.error("Error updating proof of work:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to update proof of work" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -87,10 +93,14 @@ export async function PATCH(
       featured,
       message: featured ? "Entry marked as featured" : "Entry removed from featured",
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Internal server error";
     console.error("Error PATCH proof of work featured:", error);
     return NextResponse.json(
-      { error: error?.message || "Internal server error" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -104,10 +114,14 @@ export async function DELETE(
     const { slug } = params;
     await deleteProofOfWork(slug);
     return new NextResponse(null, { status: 204 });
-  } catch (error: any) {
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to delete proof of work";
     console.error("Error deleting proof of work:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to delete proof of work" },
+      { error: message },
       { status: 500 }
     );
   }

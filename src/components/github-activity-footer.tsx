@@ -2,6 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
 const GITHUB_USERNAME = "Shivrajsoni";
 
@@ -17,11 +18,13 @@ type ContributionsPayload = {
 
 export default function GitHubActivityFooter() {
   const { resolvedTheme } = useTheme();
+  const prefersReducedMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   const [payload, setPayload] = useState<ContributionsPayload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const themeParam = resolvedTheme === "dark" ? "dark" : "light";
+  const themeParam = mounted && resolvedTheme === "dark" ? "dark" : "light";
 
   useEffect(() => setMounted(true), []);
 
@@ -31,6 +34,7 @@ export default function GitHubActivityFooter() {
 
     setLoading(true);
     setPayload(null);
+    setError(null);
 
     const ac = new AbortController();
     fetch(
@@ -48,8 +52,9 @@ export default function GitHubActivityFooter() {
         setPayload(data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((e) => {
         if (cancelled) return;
+        setError(e instanceof Error ? e.message : "Failed to load GitHub activity");
         setPayload(null);
         setLoading(false);
       });
@@ -62,11 +67,24 @@ export default function GitHubActivityFooter() {
 
   return (
     <div className="w-full border-t border-border/60 bg-transparent">
-      <div className="mx-auto w-full max-w-6xl pl-0 pr-6 py-0 sm:pl-0 sm:pr-8">
-        <div
-          className="w-full overflow-hidden aspect-[663/104] md:w-[85%] md:max-w-[85%]"
+      <div className="mx-auto w-full max-w-6xl px-6 py-0 sm:px-8">
+        <motion.div
+          className="flex w-full items-center justify-center overflow-hidden min-h-[120px] md:min-h-[160px]"
           aria-label="GitHub contributions heatmap"
           role="img"
+          style={{ willChange: "transform" }}
+          initial={{ x: 0 }}
+          animate={
+            !prefersReducedMotion && !!payload
+              ? { x: ["-10px", "10px", "-10px"] }
+              : { x: 0 }
+          }
+          transition={{
+            duration: 12,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "mirror",
+          }}
         >
           {loading ? (
             <div className="flex h-full items-center justify-center">
@@ -74,16 +92,15 @@ export default function GitHubActivityFooter() {
             </div>
           ) : payload ? (
             <div
-              className="h-full w-full [&>svg]:block [&>svg]:w-full [&>svg]:h-full"
-              // eslint-disable-next-line react/no-danger
+              className="w-full [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
               dangerouslySetInnerHTML={{ __html: payload.svg }}
             />
           ) : (
             <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
-              Could not load GitHub chart right now.
+              {error ?? "Could not load GitHub chart right now."}
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

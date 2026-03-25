@@ -30,7 +30,7 @@ const AdminLogin = () => {
         const { error } = await response.json();
         setError(error || "Invalid credentials");
       }
-    } catch (error) {
+    } catch {
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
